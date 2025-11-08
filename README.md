@@ -4,7 +4,6 @@
 
 <div align="center">
 
-![Toyota Nexus Banner](https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=1200&h=300&fit=crop)
 
 A stunning, AI-powered web application with **aurora animations**, **loading screens**, and **authentication** that helps users find their perfect Toyota vehicle through personalized recommendations.
 
