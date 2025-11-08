@@ -46,7 +46,7 @@ export default function ProfileQuiz() {
       // Submit quiz
       updateProfile(formData)
       completeProfile()
-      navigate('/explore')
+      navigate('/app/quiz-results')
     }
   }
 

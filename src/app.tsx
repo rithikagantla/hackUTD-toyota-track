@@ -17,6 +17,7 @@ import Home from './routes/Home'
 import Explore from './routes/Explore'
 import VehicleDetail from './routes/VehicleDetail'
 import ProfileQuiz from './routes/ProfileQuiz'
+import QuizResults from './routes/QuizResults'
 import About from './routes/About'
 
 // Protected route wrapper
@@ -89,6 +90,7 @@ export default function App() {
               <Route path="explore" element={<Explore />} />
               <Route path="vehicle/:id" element={<VehicleDetail />} />
               <Route path="quiz" element={<ProfileQuiz />} />
+              <Route path="quiz-results" element={<QuizResults />} />
               <Route path="about" element={<About />} />
             </Route>
           </Route>

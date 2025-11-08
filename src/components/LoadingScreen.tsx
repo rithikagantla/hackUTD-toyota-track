@@ -30,40 +30,17 @@ export default function LoadingScreen({ onComplete, duration = 2000 }: LoadingSc
     <motion.div
       initial={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] bg-gradient-to-br from-toyota-black via-toyota-black to-toyota-red-dark flex items-center justify-center"
+      className="fixed inset-0 z-[100] bg-white flex items-center justify-center"
     >
-      {/* Animated background particles */}
-      <div className="absolute inset-0 overflow-hidden">
-        {Array.from({ length: 20 }).map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-2 h-2 bg-toyota-red rounded-full opacity-20"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -100, 0],
-              opacity: [0.2, 0.5, 0.2],
-              scale: [1, 1.5, 1],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
+      {/* Subtle background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-toyota-red/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-toyota-red/5 rounded-full blur-3xl" />
       </div>
 
       <div className="relative z-10 text-center">
-        {/* Logo with animation */}
-        <motion.div
-          initial={{ scale: 0, rotate: -180 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ duration: 0.8, type: 'spring', bounce: 0.4 }}
-          className="mb-8"
-        >
+        {/* Logo */}
+        <div className="mb-8">
           <div className="w-28 h-28 mx-auto">
             <img
               src="/toyota_logo_signup.png"
@@ -71,44 +48,27 @@ export default function LoadingScreen({ onComplete, duration = 2000 }: LoadingSc
               className="w-full h-full object-contain"
             />
           </div>
-        </motion.div>
+        </div>
 
         {/* Title */}
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-          className="text-4xl font-bold text-white mb-2"
-        >
+        <h1 className="text-4xl font-bold text-toyota-black mb-2">
           Toyota <span className="text-toyota-red">Nexus</span>
-        </motion.h1>
+        </h1>
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-          className="text-gray-400 mb-8"
-        >
+        <p className="text-gray-600 mb-8">
           Your Intelligent Vehicle Assistant
-        </motion.p>
+        </p>
 
         {/* Progress Bar */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.7, duration: 0.4 }}
-          className="w-64 mx-auto"
-        >
-          <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-gradient-to-r from-toyota-red to-red-400"
-              initial={{ width: '0%' }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.3 }}
+        <div className="w-64 mx-auto">
+          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-toyota-red to-red-600 transition-all duration-300"
+              style={{ width: `${progress}%` }}
             />
           </div>
-          <p className="text-gray-400 text-sm mt-2">{progress}%</p>
-        </motion.div>
+          <p className="text-gray-600 text-sm mt-2">{progress}%</p>
+        </div>
       </div>
     </motion.div>
   )
