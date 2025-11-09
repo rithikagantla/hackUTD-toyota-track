@@ -8,7 +8,7 @@
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "api:dev": "tsx watch server.ts",
+    "api:dev": "tsx watch --env-file=.env server.ts",
     "api:start": "node --env-file=.env server.js"
   },
   "dependencies": {
@@ -22,8 +22,11 @@
     "express-oauth2-jwt-bearer": "^1.7.1",
     "framer-motion": "^11.0.3",
     "lucide-react": "^0.344.0",
+    "mongoose": "^8.6.0",
+    "plaid": "^39.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-plaid-link": "^4.1.1",
     "react-router-dom": "^6.22.0",
     "zod": "^4.1.12",
     "zustand": "^4.5.0"

@@ -4,9 +4,16 @@ import cors from "cors";
 import { z } from "zod";
 import { auth } from "express-oauth2-jwt-bearer";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import plaidRouter from "./plaidRoutes.js";
+import { connectDatabase } from "./db.ts";
 
 const app = express();
 app.use(express.json());
+
+connectDatabase().catch((error) => {
+  console.error("Failed to connect to MongoDB", error);
+  process.exit(1);
+});
 
 const corsOrigin = process.env.CORS_ORIGIN || "http://localhost:5173";
 app.use(cors({ origin: corsOrigin, credentials: true }));
@@ -21,6 +28,8 @@ if (!apiKey) {
 }
 
 const genAI = new GoogleGenerativeAI(apiKey);
+
+app.use("/api/plaid", plaidRouter);
 
 const ChatSchema = z.object({
   messages: z.array(
