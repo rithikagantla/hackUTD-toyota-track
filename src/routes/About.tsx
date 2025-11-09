@@ -7,7 +7,7 @@ export default function About() {
     <div>
       <Hero
         title="About Toyota Nexus"
-        subtitle="Helping you make confident vehicle decisions with personalized recommendations and transparent information"
+        subtitle="Your next chapter deserves the perfect ride—we map your vibe to your ideal Toyota companion"
         compact
       />
 
@@ -20,10 +20,11 @@ export default function About() {
             </h2>
             <Card padding="lg">
               <p className="text-lg text-toyota-gray-dark leading-relaxed text-center">
-                Toyota Nexus is designed to simplify the vehicle shopping experience by providing
-                personalized recommendations based on your unique needs, lifestyle, and budget.
-                We believe that finding the right vehicle shouldn't be overwhelming—it should be
-                empowering and enjoyable.
+                Toyota Nexus reimagines car shopping as a journey of self-discovery. Instead of
+                drowning you in specs and sales pitches, we ask about your life—your weekend vibe,
+                your dreams for the next 3-5 years, how you spend your free time. Then we translate
+                those stories into the perfect Toyota match. Because your vehicle should amplify who
+                you are and where you're going.
               </p>
             </Card>
           </div>
@@ -41,11 +42,11 @@ export default function About() {
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold text-toyota-black mb-2">
-                      Personalization
+                      Vibe-Based Matching
                     </h3>
                     <p className="text-toyota-gray-dark">
-                      Every driver is unique. Our intelligent matching system learns your
-                      preferences to recommend vehicles that truly fit your lifestyle.
+                      We don't just ask about MPG and cargo space. We ask about your weekends,
+                      your emotions, your dreams. Then we match you to a Toyota that amplifies your life.
                     </p>
                   </div>
                 </div>
@@ -75,11 +76,11 @@ export default function About() {
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold text-toyota-black mb-2">
-                      Innovation
+                      Story-Driven AI
                     </h3>
                     <p className="text-toyota-gray-dark">
-                      Leveraging AI and modern technology to provide instant answers and
-                      intelligent recommendations at your fingertips.
+                      Our AI reads between the lines of your narrative. It finds patterns in your
+                      lifestyle choices and translates them into the perfect vehicle fit.
                     </p>
                   </div>
                 </div>
@@ -117,11 +118,11 @@ export default function About() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-toyota-black mb-1">
-                      Complete the Profile Quiz
+                      Share Your Weekend Vibe
                     </h3>
                     <p className="text-toyota-gray-dark">
-                      Answer 6 quick questions about your budget, driving habits, and lifestyle
-                      preferences to help us understand what matters to you.
+                      Tell us if you're hitting city brunch spots, escaping to trailheads, running
+                      kids to games, or tackling DIY projects. Your off-duty rhythm reveals a lot.
                     </p>
                   </div>
                 </div>
@@ -132,11 +133,11 @@ export default function About() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-toyota-black mb-1">
-                      Get Personalized Matches
+                      Define Your Vehicle Emotion
                     </h3>
                     <p className="text-toyota-gray-dark">
-                      Browse our complete lineup with filters tailored to your preferences.
-                      See why each vehicle is a good fit based on your profile.
+                      When you picture your next ride, what hits first? Security? Efficiency? Freedom?
+                      Thrill? Your gut feeling guides us to the right vehicle DNA.
                     </p>
                   </div>
                 </div>
@@ -147,11 +148,11 @@ export default function About() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-toyota-black mb-1">
-                      Explore Payment Options
+                      Show Us Your Spending Style
                     </h3>
                     <p className="text-toyota-gray-dark">
-                      Use our interactive payment simulator to see financing and leasing
-                      estimates with adjustable terms, rates, and down payments.
+                      You get a free Saturday and $500—are you stacking savings, packing the trunk for
+                      Home Depot, planning a road trip, or dressing up for the city? Your choices matter.
                     </p>
                   </div>
                 </div>
@@ -162,11 +163,26 @@ export default function About() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-toyota-black mb-1">
-                      Ask the AI Assistant
+                      Paint Your Future Chapter
                     </h3>
                     <p className="text-toyota-gray-dark">
-                      Have questions? Chat with our AI-powered assistant to compare vehicles,
-                      get recommendations, or learn more about features and options.
+                      Write about what you're building in the next 3-5 years. Whether it's family growth,
+                      career moves, or new adventures, your next vehicle should boost that story.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0 w-8 h-8 bg-toyota-red text-white rounded-full flex items-center justify-center font-bold">
+                    5
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-toyota-black mb-1">
+                      Get Your Perfect Match
+                    </h3>
+                    <p className="text-toyota-gray-dark">
+                      Our AI translates your answers into personalized Toyota recommendations. See payment
+                      options, compare models, and chat with our assistant for deeper insights.
                     </p>
                   </div>
                 </div>

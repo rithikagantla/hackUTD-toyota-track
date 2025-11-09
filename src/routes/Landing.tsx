@@ -55,26 +55,26 @@ export default function Landing() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center pt-20 bg-gradient-to-br from-white via-red-50 to-white overflow-hidden">
+      <section className="relative min-h-screen flex items-center pt-20 bg-gradient-to-br from-gray-900 via-gray-800 to-toyota-black overflow-hidden">
         {/* Floating Shapes */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-toyota-red/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-toyota-red/10 rounded-full blur-3xl" />
+          <div className="absolute top-20 left-10 w-72 h-72 bg-toyota-red/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-toyota-red/20 rounded-full blur-3xl" />
         </div>
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left Content */}
             <div>
-              <h1 className="text-6xl lg:text-7xl font-bold text-toyota-black mb-8 leading-tight">
+              <h1 className="text-6xl lg:text-7xl font-bold text-white mb-8 leading-tight">
                 Your Smart{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-toyota-red to-red-600">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-toyota-red to-red-400">
                   Toyota Finder
                 </span>
               </h1>
 
               <div className="min-h-[120px] mb-8">
-                <p className="text-xl text-gray-700 leading-relaxed">
+                <p className="text-xl text-gray-300 leading-relaxed">
                   {displayedText}
                   <span className="inline-block w-0.5 h-6 bg-toyota-red ml-1 animate-pulse" />
                 </p>
@@ -93,7 +93,7 @@ export default function Landing() {
                   variant="outline"
                   size="lg"
                   onClick={() => navigate('/login')}
-                  className="!px-8 !py-4 !text-lg !border-2 !border-toyota-red !text-toyota-red hover:!bg-toyota-red hover:!text-white"
+                  className="!px-8 !py-4 !text-lg !border-2 !border-white !text-white hover:!bg-white hover:!text-toyota-black"
                 >
                   Sign In
                 </Button>
@@ -108,7 +108,7 @@ export default function Landing() {
                 ].map((item) => (
                   <div key={item} className="flex items-center gap-3">
                     <CheckCircle className="w-5 h-5 text-toyota-red flex-shrink-0" />
-                    <span className="text-gray-700">{item}</span>
+                    <span className="text-gray-300">{item}</span>
                   </div>
                 ))}
               </div>
@@ -116,9 +116,9 @@ export default function Landing() {
 
             {/* Right Card */}
             <div className="relative">
-              <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-200">
+              <div className="bg-white/10 backdrop-blur-md rounded-3xl shadow-2xl p-8 border border-white/20">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-2xl font-bold text-toyota-black">Why Toyota Nexus?</h3>
+                  <h3 className="text-2xl font-bold text-white">Why Toyota Nexus?</h3>
                   <img
                     src="/toyota_logo_signup.png"
                     alt="Toyota"
@@ -129,36 +129,36 @@ export default function Landing() {
                 <div className="space-y-6">
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-700">AI Match Accuracy</span>
+                      <span className="text-sm font-medium text-gray-200">AI Match Accuracy</span>
                       <span className="text-sm font-bold text-toyota-red">98%</span>
                     </div>
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div className="h-full w-[98%] bg-gradient-to-r from-toyota-red to-red-600 rounded-full" />
+                    <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+                      <div className="h-full w-[98%] bg-gradient-to-r from-toyota-red to-red-400 rounded-full" />
                     </div>
                   </div>
 
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-700">Customer Satisfaction</span>
+                      <span className="text-sm font-medium text-gray-200">Customer Satisfaction</span>
                       <span className="text-sm font-bold text-toyota-red">95%</span>
                     </div>
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div className="h-full w-[95%] bg-gradient-to-r from-toyota-red to-red-600 rounded-full" />
+                    <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+                      <div className="h-full w-[95%] bg-gradient-to-r from-toyota-red to-red-400 rounded-full" />
                     </div>
                   </div>
 
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-700">Time Saved</span>
+                      <span className="text-sm font-medium text-gray-200">Time Saved</span>
                       <span className="text-sm font-bold text-toyota-red">87%</span>
                     </div>
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div className="h-full w-[87%] bg-gradient-to-r from-toyota-red to-red-600 rounded-full" />
+                    <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+                      <div className="h-full w-[87%] bg-gradient-to-r from-toyota-red to-red-400 rounded-full" />
                     </div>
                   </div>
                 </div>
 
-                <p className="mt-6 text-sm text-gray-600">
+                <p className="mt-6 text-sm text-gray-300">
                   Join thousands of satisfied customers who found their perfect vehicle with our AI-powered platform.
                 </p>
               </div>
