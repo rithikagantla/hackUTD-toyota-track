@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { Menu, X, LogOut, User } from 'lucide-react'
 import Button from '../ui/Button'
-import { useAuthStore } from '../../store/auth'
+import { useAuth0 } from '@auth0/auth0-react'
 import { clsx } from 'clsx'
 
 const navLinks = [
@@ -16,14 +16,16 @@ export default function NavBar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
   const location = useLocation()
-  const navigate = useNavigate()
-  const { user, logout } = useAuthStore()
+  const { user, logout } = useAuth0()
 
   const isActive = (path: string) => location.pathname === path
 
-  const handleLogout = async () => {
-    await logout()
-    navigate('/')
+  const handleLogout = () => {
+    logout({
+      logoutParams: {
+        returnTo: window.location.origin + '/',
+      },
+    })
   }
 
   return (

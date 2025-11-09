@@ -1,35 +1,25 @@
-import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
+import { useAuth0 } from '@auth0/auth0-react'
 import Button from '../components/ui/Button'
-import { useAuthStore } from '../store/auth'
 
 export default function Signup() {
-  const navigate = useNavigate()
-  const { signup, isAuthenticated, isLoading } = useAuthStore()
-  const [email, setEmail] = useState('')
-  const [name, setName] = useState('')
-  const [loading, setLoading] = useState(false)
+  const { loginWithRedirect, isLoading, isAuthenticated } = useAuth0()
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/app')
+      window.location.href = '/app'
     }
-  }, [isAuthenticated, navigate])
+  }, [isAuthenticated])
 
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!email) return
-
-    setLoading(true)
-    try {
-      await signup(email, name || undefined)
-      navigate('/app')
-    } catch (error) {
-      console.error('Signup failed:', error)
-    } finally {
-      setLoading(false)
-    }
+  const handleSignup = async () => {
+    await loginWithRedirect({
+      appState: { returnTo: '/app' },
+      authorizationParams: {
+        screen_hint: 'signup',
+      },
+    })
   }
 
   return (
@@ -56,55 +46,30 @@ export default function Signup() {
           <p className="text-gray-600">Join Toyota Nexus and find your perfect vehicle</p>
         </div>
 
-        {/* Signup Form */}
+        {/* Auth0 Signup Button */}
         <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg">
-          <form onSubmit={handleSignup} className="space-y-6">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-toyota-black mb-2">
-                Email Address
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-toyota-red focus:border-transparent transition-colors"
-                placeholder="your.email@example.com"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-toyota-black mb-2">
-                Name (Optional)
-              </label>
-              <input
-                type="text"
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-toyota-red focus:border-transparent transition-colors"
-                placeholder="Your Name"
-              />
-            </div>
-
+          <div className="space-y-6">
             <Button
-              type="submit"
+              onClick={handleSignup}
               fullWidth
               size="lg"
-              disabled={loading || isLoading || !email}
+              disabled={isLoading}
               className="!py-3"
             >
-              {loading || isLoading ? (
+              {isLoading ? (
                 <>
                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Creating account...
+                  Loading...
                 </>
               ) : (
-                'Create Account'
+                'Sign Up with Auth0'
               )}
             </Button>
-          </form>
+
+            <p className="text-sm text-gray-500 text-center">
+              Secure authentication powered by Auth0
+            </p>
+          </div>
 
           {/* Footer */}
           <div className="mt-6 text-center">
