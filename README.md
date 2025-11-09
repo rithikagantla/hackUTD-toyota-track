@@ -5,7 +5,7 @@
 <div align="center">
 
 
-A stunning, AI-powered web application with **aurora animations**, **loading screens**, and **authentication** that helps users find their perfect Toyota vehicle through personalized recommendations.
+A stunning, AI-powered web application with **loading screens**, and **authentication** that helps users find their perfect Toyota vehicle through personalized recommendations.
 
 [🎯 Features](#features) • [🚀 Quick Start](#quick-start) • [🎨 Screenshots](#screenshots) • [🤖 AI Chatbot](#chatbot-modes)
 
@@ -15,11 +15,6 @@ A stunning, AI-powered web application with **aurora animations**, **loading scr
 
 ## ✨ What's New
 
-### 🎭 Beautiful Landing Page
-- **Aurora background animations** with mouse-tracking effects
-- Floating particles and animated gradient blobs
-- Smooth transitions and hover effects
-- Modern glass-morphism design
 
 ### 🔐 Authentication System
 - Sign up / Sign in pages with stunning UI
@@ -31,7 +26,6 @@ A stunning, AI-powered web application with **aurora animations**, **loading scr
 ### ⚡ Loading Screen
 - Animated logo reveal
 - Progress bar with smooth transitions
-- Floating particle effects
 - 2-second smooth loading experience
 
 ### 🎨 Enhanced Animations
