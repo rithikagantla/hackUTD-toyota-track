@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Outlet, useLocation, Navigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useState } from 'react'
-import { useAuth0 } from '@auth0/auth0-react'
+import { useAuthStore } from './store/auth'
 import NavBar from './components/layout/NavBar'
 import Footer from './components/layout/Footer'
 import Chatbot from './components/Chatbot'
@@ -22,7 +22,7 @@ import About from './routes/About'
 
 // Protected route wrapper
 function ProtectedRoute() {
-  const { isAuthenticated, isLoading } = useAuth0()
+  const { isAuthenticated, isLoading } = useAuthStore()
 
   if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center">
