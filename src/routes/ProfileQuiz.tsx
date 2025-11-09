@@ -1,4 +1,4 @@
-import { type ChangeEvent, useMemo, useState } from 'react'
+import { type ChangeEvent, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ChevronRight, ChevronLeft, Check } from 'lucide-react'
 import { useProfileStore, WeekendVibe, VehicleEmotion, SpendingStyle } from '../store/profile'
@@ -6,13 +6,17 @@ import Hero from '../components/layout/Hero'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
 import { motion, AnimatePresence } from 'framer-motion'
+import { usePlaidLink } from 'react-plaid-link'
+import { createLinkToken, exchangePublicToken, analyzeFinances } from '../lib/plaid'
+import { useAuthStore } from '../store/auth'
 
-const TOTAL_STEPS = 4
+const TOTAL_STEPS = 5
 const MIN_FUTURE_CHAPTER_LENGTH = 40
 
 export default function ProfileQuiz() {
   const navigate = useNavigate()
   const { profile, updateProfile, completeProfile } = useProfileStore()
+  const { user } = useAuthStore()
   const [currentStep, setCurrentStep] = useState<number>(1)
 
   type FormState = {
@@ -28,6 +32,12 @@ export default function ProfileQuiz() {
     spendingStyle: profile.spendingStyle ?? null,
     futureChapterNarrative: profile.futureChapterNarrative ?? '',
   })
+  const [linkToken, setLinkToken] = useState<string | null>(null)
+  const [accountLinked, setAccountLinked] = useState(false)
+  const [plaidSkipped, setPlaidSkipped] = useState(false)
+  const [analysisStatus, setAnalysisStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [analysisMessage, setAnalysisMessage] = useState<string | null>(null)
+  const [pendingPlaidOpen, setPendingPlaidOpen] = useState(false)
 
   const updateFormData = <K extends keyof typeof formData>(
     key: K,
@@ -57,6 +67,8 @@ export default function ProfileQuiz() {
   }
 
   const progress = (currentStep / TOTAL_STEPS) * 100
+  const authToken = user?.id ?? ''
+  const isFinancialsStep = currentStep === TOTAL_STEPS
 
   const canProceed = useMemo(() => {
     switch (currentStep) {
@@ -68,10 +80,126 @@ export default function ProfileQuiz() {
         return Boolean(formData.spendingStyle)
       case 4:
         return formData.futureChapterNarrative.trim().length >= MIN_FUTURE_CHAPTER_LENGTH
+      case 5:
+        if (!authToken) return true
+        return plaidSkipped || accountLinked || analysisStatus === 'success'
       default:
         return true
     }
-  }, [currentStep, formData])
+  }, [currentStep, formData, plaidSkipped, accountLinked, analysisStatus, authToken])
+
+  const fetchLinkToken = async (showStatus: boolean = false): Promise<boolean> => {
+    if (!authToken) return false
+
+    if (showStatus) {
+      setAnalysisStatus('loading')
+      setAnalysisMessage('Preparing secure Plaid session…')
+    }
+
+    try {
+      const response = await createLinkToken(authToken)
+      setLinkToken(response.link_token)
+      if (showStatus) {
+        setAnalysisStatus('idle')
+        setAnalysisMessage(null)
+      }
+      return true
+    } catch (error) {
+      console.error('Failed to create Plaid link token', error)
+      setAnalysisStatus('error')
+      setAnalysisMessage(
+        error instanceof Error ? error.message : 'Unable to start Plaid linking. Please try again.'
+      )
+      return false
+    }
+  }
+
+  useEffect(() => {
+    if (!isFinancialsStep || linkToken || accountLinked || plaidSkipped || !authToken) {
+      return
+    }
+
+    let cancelled = false
+
+    fetchLinkToken(false).then(() => {
+      if (cancelled) return
+      setAnalysisStatus('idle')
+      setAnalysisMessage(null)
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [isFinancialsStep, linkToken, accountLinked, plaidSkipped, authToken])
+
+  const handlePlaidSuccess = async (publicToken: string) => {
+    if (!authToken) return
+
+    try {
+      setAnalysisStatus('loading')
+      setAnalysisMessage('Linking your finances...')
+      await exchangePublicToken(authToken, { public_token: publicToken })
+      setAccountLinked(true)
+      const response = await analyzeFinances(authToken)
+      setAnalysisStatus('success')
+      setAnalysisMessage(response.message || 'Financial profile captured.')
+    } catch (error) {
+      console.error('Plaid integration error', error)
+      setAnalysisStatus('error')
+      setAnalysisMessage(error instanceof Error ? error.message : 'Unable to analyze finances.')
+    }
+  }
+
+  const { open, ready } = usePlaidLink(
+    linkToken
+      ? {
+          token: linkToken,
+          onSuccess: handlePlaidSuccess,
+          onExit: () => {
+            if (!accountLinked) {
+              setAnalysisStatus('idle')
+            }
+          }
+        }
+      : { token: '', onSuccess: () => undefined }
+  )
+
+  useEffect(() => {
+    if (pendingPlaidOpen && linkToken && ready && analysisStatus !== 'loading') {
+      open()
+      setPendingPlaidOpen(false)
+    }
+  }, [pendingPlaidOpen, linkToken, ready, analysisStatus, open])
+
+  const handleLinkBankAccount = async () => {
+    if (!authToken) return
+    if (plaidSkipped) {
+      setPlaidSkipped(false)
+    }
+
+    if (!linkToken) {
+      const ok = await fetchLinkToken(true)
+      if (ok) {
+        setPendingPlaidOpen(true)
+      }
+      return
+    }
+
+    if (!ready) {
+      setPendingPlaidOpen(true)
+      return
+    }
+
+    open()
+  }
+
+  const handleSkipPlaid = () => {
+    setPlaidSkipped(true)
+    setPendingPlaidOpen(false)
+    setLinkToken(null)
+    setAnalysisStatus('idle')
+    setAnalysisMessage(null)
+  }
 
   return (
     <div>
@@ -305,6 +433,68 @@ export default function ProfileQuiz() {
                         {Math.max(formData.futureChapterNarrative.trim().length, 0)} / {MIN_FUTURE_CHAPTER_LENGTH}
                       </span>
                     </div>
+                  </div>
+                )}
+
+                {/* Step 5: Financials */}
+                {currentStep === 5 && (
+                  <div>
+                    <h2 className="text-2xl font-semibold text-toyota-black mb-2">
+                      Add financial context (optional)
+                    </h2>
+                    <p className="text-toyota-gray-dark mb-6">
+                      Link a bank account securely with Plaid to let us tailor payments and recommendations to your real budget.
+                    </p>
+
+                    {authToken ? (
+                      <div className="space-y-4">
+                        <p className="text-sm text-toyota-gray-dark">
+                          Plaid provides read-only access. We never see your credentials, and you can remove access anytime.
+                        </p>
+
+                        <div className="flex flex-wrap gap-3">
+                          <Button onClick={handleLinkBankAccount} disabled={!authToken}>
+                            {accountLinked ? 'Account Linked' : analysisStatus === 'loading' ? 'Linking…' : 'Link Bank Account'}
+                          </Button>
+                          <Button variant="ghost" onClick={handleSkipPlaid}>
+                            Skip This Step
+                          </Button>
+                        </div>
+
+                        {analysisStatus === 'success' && analysisMessage && (
+                          <div className="text-sm text-green-600 bg-green-50 border border-green-200 rounded-md p-3">
+                            {analysisMessage}
+                          </div>
+                        )}
+
+                        {analysisStatus === 'error' && (
+                          <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md p-3">
+                            {analysisMessage ?? 'Something went wrong while analyzing finances.'}
+                          </div>
+                        )}
+
+                        {analysisStatus === 'loading' && (
+                          <div className="text-sm text-toyota-gray-dark">
+                            Crunching the numbers… this usually takes just a moment.
+                          </div>
+                        )}
+
+                        {plaidSkipped && (
+                          <div className="text-xs text-toyota-gray-dark">
+                            You skipped Plaid for now. You can link an account later from your profile.
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        <div className="text-sm text-toyota-gray-dark">
+                          Create an account or sign in to optionally link Plaid. You can also continue without this step.
+                        </div>
+                        <Button variant="ghost" onClick={handleSkipPlaid}>
+                          Skip This Step
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 )}
               </motion.div>
