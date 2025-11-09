@@ -1,9 +1,11 @@
 const defaultBase =
   typeof window !== 'undefined'
-    ? `${window.location.protocol}//${window.location.hostname}:8080/api`
-    : 'http://localhost:8080/api';
+    ? `${window.location.protocol}//${window.location.hostname}:8080`
+    : 'http://localhost:8080';
 
-const API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '') || defaultBase;
+const rawBase = (import.meta.env.VITE_API_BASE_URL as string | undefined) || defaultBase;
+const trimmedBase = rawBase.replace(/\/$/, '');
+const API_BASE = trimmedBase.endsWith('/api') ? trimmedBase : `${trimmedBase}/api`;
 
 async function postJson<T>(path: string, token: string, body?: Record<string, unknown>): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {
