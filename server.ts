@@ -57,7 +57,7 @@ const wrapAuth = (handler: express.RequestHandler): express.RequestHandler => {
 // Non-streaming endpoint
 app.post("/api/chat", wrapAuth(async (req, res) => {
   const parsed = ChatSchema.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.issues });
 
   const { messages, model = "gemini-2.0-flash-exp", temperature = 0.5 } = parsed.data;
   const sys = messages.find(m => m.role === "system")?.content;
@@ -84,7 +84,7 @@ app.post("/api/chat", wrapAuth(async (req, res) => {
 // Streaming endpoint (SSE)
 app.post("/api/chat/stream", wrapAuth(async (req, res) => {
   const parsed = ChatSchema.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.issues });
 
   const { messages, model = "gemini-2.0-flash-exp", temperature = 0.5 } = parsed.data;
 

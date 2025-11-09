@@ -69,7 +69,12 @@ export default function App() {
   const [showLoading, setShowLoading] = useState(true)
 
   return (
-    <BrowserRouter>
+    <BrowserRouter
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true
+      }}
+    >
       <AnimatePresence mode="wait">
         {showLoading && (
           <LoadingScreen onComplete={() => setShowLoading(false)} duration={2000} />

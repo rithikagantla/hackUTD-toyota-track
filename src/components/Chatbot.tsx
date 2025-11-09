@@ -12,7 +12,7 @@ export default function Chatbot() {
     {
       role: 'system',
       content:
-        "You are Toyota Nexus, a helpful assistant for Toyota models, trims, pricing caveats, financing vs. leasing, safety features, and ownership tips. Be concise. If unsure, say so and suggest official sources."
+        "You are Toyota Nexus, a friendly and conversational AI assistant. You can chat naturally about everyday topics, answer general questions, and have casual conversations like a human would. When users ask about Toyota vehicles, models, trims, pricing, financing vs. leasing, safety features, or ownership tips, you provide expert, detailed advice. Be warm, personable, and helpful in all conversations. Keep responses concise and natural."
     }
   ])
   const [input, setInput] = useState('')
@@ -61,7 +61,7 @@ export default function Chatbot() {
           setMessages(m => {
             const copy = [...m]
             const last = copy[copy.length - 1]
-            if (last?.role === "model") last.content = chunk.text
+            if (last?.role === "model" && chunk.text) last.content = chunk.text
             return copy
           })
         }
@@ -73,7 +73,7 @@ export default function Chatbot() {
     }
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleSend()
@@ -229,7 +229,7 @@ export default function Chatbot() {
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    onKeyPress={handleKeyPress}
+                    onKeyDown={handleKeyDown}
                     placeholder="Ask me anything..."
                     disabled={isLoading}
                     className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-toyota-red focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
