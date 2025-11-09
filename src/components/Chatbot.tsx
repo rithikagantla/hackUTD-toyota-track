@@ -1,33 +1,26 @@
 import { useState, useRef, useEffect } from 'react'
-import { MessageSquare, Send, X, Settings, Loader2 } from 'lucide-react'
+import { MessageSquare, Send, X, Loader2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Button from './ui/Button'
 import Card from './ui/Card'
-import Badge from './ui/Badge'
-import SettingsModal from './SettingsModal'
-import { generateAIResponse, getQuickSuggestions, ChatMessage, AIMode } from '../lib/ai'
-import { useProfileStore } from '../store/profile'
-import { vehicles } from '../data/vehicles'
+import { streamChat, type ChatMessage, getQuickSuggestions } from '../lib/ai'
 import { clsx } from 'clsx'
 
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false)
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
-      id: '1',
-      role: 'assistant',
-      content: "Hi! I'm your Toyota Nexus assistant. Ask me anything about vehicles, comparisons, or financing!",
-      timestamp: new Date(),
-    },
+      role: 'system',
+      content:
+        "You are Toyota Nexus, a helpful assistant for Toyota models, trims, pricing caveats, financing vs. leasing, safety features, and ownership tips. Be concise. If unsure, say so and suggest official sources."
+    }
   ])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const { profile } = useProfileStore()
+  const abortRef = useRef<AbortController | null>(null)
 
-  const mode: AIMode = localStorage.getItem('GEMINI_API_KEY') ? 'gemini' : 'mock'
-  const quickSuggestions = getQuickSuggestions(profile.completed ? profile : undefined)
+  const quickSuggestions = getQuickSuggestions()
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -41,47 +34,40 @@ export default function Chatbot() {
     const textToSend = message || input.trim()
     if (!textToSend || isLoading) return
 
-    // Add user message
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: textToSend,
-      timestamp: new Date(),
-    }
-    setMessages((prev) => [...prev, userMessage])
+    const userMsg: ChatMessage = { role: "user", content: textToSend }
     setInput('')
+
+    setMessages(m => [...m, userMsg, { role: "model", content: "" }])
     setIsLoading(true)
 
+    abortRef.current?.abort()
+    abortRef.current = new AbortController()
+
     try {
-      // Generate AI response
-      const apiKey = localStorage.getItem('GEMINI_API_KEY') || undefined
-      const model = localStorage.getItem('GEMINI_MODEL') || 'gemini-1.5-flash'
-
-      const response = await generateAIResponse(
-        textToSend,
-        mode,
-        { profile: profile.completed ? profile : undefined, vehicles },
-        apiKey,
-        model
-      )
-
-      // Add assistant message
-      const assistantMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: response,
-        timestamp: new Date(),
+      for await (const chunk of streamChat(
+        { messages: [...messages, userMsg], model: "gemini-2.0-flash-exp", temperature: 0.5 },
+        abortRef.current
+      )) {
+        if (chunk?.error) throw new Error(chunk.error)
+        if (chunk?.delta) {
+          setMessages(m => {
+            const copy = [...m]
+            const last = copy[copy.length - 1]
+            if (last?.role === "model") last.content += chunk.delta
+            return copy
+          })
+        }
+        if (chunk?.done && chunk?.text) {
+          setMessages(m => {
+            const copy = [...m]
+            const last = copy[copy.length - 1]
+            if (last?.role === "model") last.content = chunk.text
+            return copy
+          })
+        }
       }
-      setMessages((prev) => [...prev, assistantMessage])
-    } catch (error) {
-      // Error message
-      const errorMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: error instanceof Error ? error.message : 'Sorry, I encountered an error. Please try again.',
-        timestamp: new Date(),
-      }
-      setMessages((prev) => [...prev, errorMessage])
+    } catch (e: any) {
+      setMessages(m => [...m, { role: "model", content: `⚠️ ${e.message || "Chat error"}` }])
     } finally {
       setIsLoading(false)
     }
@@ -97,6 +83,9 @@ export default function Chatbot() {
   const handleSuggestionClick = (suggestion: string) => {
     handleSend(suggestion)
   }
+
+  // Filter out system messages for display
+  const displayMessages = messages.filter(m => m.role !== 'system')
 
   return (
     <>
@@ -138,23 +127,9 @@ export default function Chatbot() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Toyota Nexus</h3>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="success" size="sm">
-                        {mode === 'gemini' ? 'AI Mode' : 'MOCK Mode'}
-                      </Badge>
-                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setIsSettingsOpen(true)}
-                    className="!text-white hover:bg-white/10 !p-2"
-                    aria-label="Settings"
-                  >
-                    <Settings className="w-5 h-5" />
-                  </Button>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -169,9 +144,19 @@ export default function Chatbot() {
 
               {/* Messages */}
               <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin bg-toyota-gray-light">
-                {messages.map((message) => (
+                {displayMessages.length === 0 && (
+                  <div className="flex justify-start">
+                    <div className="max-w-[80%] rounded-lg px-4 py-2 bg-white text-toyota-black border border-gray-200">
+                      <div className="text-sm">
+                        Hi! I'm your Toyota Nexus assistant. Ask me anything about vehicles, comparisons, or financing!
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {displayMessages.map((message, idx) => (
                   <div
-                    key={message.id}
+                    key={idx}
                     className={clsx(
                       'flex',
                       message.role === 'user' ? 'justify-end' : 'justify-start'
@@ -204,17 +189,6 @@ export default function Chatbot() {
                           )
                         })}
                       </div>
-                      <div
-                        className={clsx(
-                          'text-xs mt-1',
-                          message.role === 'user' ? 'text-white/70' : 'text-toyota-gray-dark'
-                        )}
-                      >
-                        {message.timestamp.toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </div>
                     </div>
                   </div>
                 ))}
@@ -231,7 +205,7 @@ export default function Chatbot() {
               </div>
 
               {/* Quick Suggestions */}
-              {messages.length <= 2 && !isLoading && (
+              {displayMessages.length === 0 && !isLoading && (
                 <div className="px-4 py-2 border-t border-gray-200 bg-white">
                   <div className="text-xs text-toyota-gray-dark mb-2">Quick suggestions:</div>
                   <div className="flex flex-wrap gap-2">
@@ -274,9 +248,6 @@ export default function Chatbot() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Settings Modal */}
-      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </>
   )
 }
