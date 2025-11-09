@@ -1,7 +1,4 @@
-import mongoose from 'mongoose';
-import { env } from './env.js';
-
+// Database disabled: no-op connector retained to avoid import errors.
 export async function connectDB() {
-  await mongoose.connect(env.MONGODB_URI, { dbName: 'toyota-nexus' });
-  console.log('[db] connected');
+  console.log('[db] skipped (no database configured)');
 }
