@@ -3,29 +3,20 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
-  },
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc && vite build",
+        "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+        "preview": "vite preview"
+    },
   "dependencies": {
-<<<<<<< HEAD
-    "@google/genai": "^1.29.0",
-=======
->>>>>>> auth0
-    "@google/generative-ai": "^0.2.1",
-    "all": "^0.0.0",
+    "@google/generative-ai": "^0.24.1",
     "clsx": "^2.1.0",
     "framer-motion": "^11.0.3",
     "lucide-react": "^0.344.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.0",
-<<<<<<< HEAD
-    "zod": "^4.1.12",
-=======
->>>>>>> auth0
     "zustand": "^4.5.0"
   },
   "devDependencies": {
@@ -41,11 +32,7 @@
     "eslint-plugin-react-refresh": "^0.4.5",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5.3.3",
-<<<<<<< HEAD
-    "vite": "^7.2.2"
-=======
+    "typescript": "^5.9.3",
     "vite": "^6.4.1"
->>>>>>> auth0
   }
 }

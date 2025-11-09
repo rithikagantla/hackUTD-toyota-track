@@ -19,16 +19,13 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
 
     /* Path aliases */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "react": ["./src/types/react"],
-      "react/jsx-runtime": ["./src/types/react-jsx-runtime"],
-      "react/jsx-dev-runtime": ["./src/types/react-jsx-runtime"],
-      "react-router-dom": ["./src/types/react-router-dom"],
-      "framer-motion": ["./src/types/framer-motion"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src"],
