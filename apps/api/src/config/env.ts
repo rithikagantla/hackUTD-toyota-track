@@ -10,7 +10,8 @@ export const env = {
   PORT: Number(process.env.PORT || 5001),
   NODE_ENV: process.env.NODE_ENV || 'development',
   WEB_ORIGIN: req('WEB_ORIGIN'),
-  MONGODB_URI: req('MONGODB_URI'),
+  // Optional: not used if the project doesn't require a database
+  MONGODB_URI: process.env.MONGODB_URI || '',
   AUTH0_DOMAIN: req('AUTH0_DOMAIN'),
   AUTH0_AUDIENCE: req('AUTH0_AUDIENCE'),
   AUTH0_ISSUER: req('AUTH0_ISSUER'),

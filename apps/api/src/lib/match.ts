@@ -1,5 +1,37 @@
-import type { PreferenceDoc } from '../models/Preference.js';
-import type { VehicleDoc } from '../models/Vehicle.js';
+// Types simplified after removing MongoDB / Mongoose models.
+export interface VehicleDoc {
+  make?: string;
+  model: string;
+  year: number;
+  trim: string;
+  msrp: number;
+  bodyStyle: 'sedan'|'suv'|'truck'|'minivan'|'coupe';
+  fuelType: 'gas'|'hybrid'|'ev';
+  mpgCity?: number;
+  mpgHwy?: number;
+  batteryRangeMi?: number;
+  drivetrain?: 'FWD'|'AWD'|'RWD';
+  seats?: number;
+  safetyRating?: number;
+  features?: string[];
+  images?: string[];
+  specs?: Record<string, any>;
+}
+
+export interface PreferenceDoc {
+  userSub?: string;
+  budgetMonthly?: number;
+  financeGoal?: 'lease'|'finance'|'undecided';
+  zipcode?: string;
+  fuelType?: 'gas'|'hybrid'|'ev'|'any';
+  bodyStyle?: 'sedan'|'suv'|'truck'|'minivan'|'coupe'|'any';
+  familySize?: number;
+  commuteMilesDaily?: number;
+  parking?: 'street'|'garage'|'driveway';
+  chargingAccess?: 'none'|'120V'|'240V';
+  drivingStyle?: 'calm'|'balanced'|'spirited';
+  lifestyleTags?: string[];
+}
 import { financeLoan } from './finance.js';
 
 export type ReasonTag =

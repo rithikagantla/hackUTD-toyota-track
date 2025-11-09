@@ -1,5 +1,4 @@
-import type { PreferenceDoc } from '../models/Preference.js';
-import type { VehicleDoc } from '../models/Vehicle.js';
+import type { PreferenceDoc, VehicleDoc } from './match.js';
 
 // Placeholder: synthesize a preference string (later embed with Gemini & Atlas Vector Search)
 export function synthesizePrefText(p: PreferenceDoc) {
