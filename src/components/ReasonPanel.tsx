@@ -1,6 +1,6 @@
 import { Vehicle } from '../data/vehicles'
 import { UserProfile } from '../store/profile'
-import { Check, Zap } from 'lucide-react'
+import { Check, Zap, Sparkles } from 'lucide-react'
 import Card from './ui/Card'
 
 interface ReasonPanelProps {
@@ -14,156 +14,183 @@ interface Reason {
   highlight?: boolean
 }
 
-/**
- * Generate personalized reasons why a vehicle is a good fit
- * based on the vehicle specs and user profile
- */
+function hasFeature(vehicle: Vehicle, keywords: string[]) {
+  const lowerKeywords = keywords.map((k) => k.toLowerCase())
+  return lowerKeywords.some((keyword) =>
+    vehicle.features.some((feature) => feature.toLowerCase().includes(keyword))
+  )
+}
+
 function generateReasons(vehicle: Vehicle, profile?: UserProfile): Reason[] {
   const reasons: Reason[] = []
 
-  // Budget fit (if profile exists)
-  if (profile && profile.completed) {
-    const estimatedMonthly = Math.round(vehicle.msrp / 60) // Rough estimate
-    if (estimatedMonthly <= profile.budgetMonthly) {
-      reasons.push({
-        icon: Check,
-        text: `Fits within your $${profile.budgetMonthly}/mo budget target`,
-        highlight: true,
-      })
-    } else if (estimatedMonthly <= profile.budgetMonthly * 1.15) {
-      reasons.push({
-        icon: Check,
-        text: `Close to your budget at ~$${estimatedMonthly}/mo`,
-      })
+  if (profile?.completed) {
+    switch (profile.weekendVibe) {
+      case 'city_adventures':
+        reasons.push({
+          icon: Check,
+          text: 'Compact-friendly footprint with tech-forward amenities for downtown adventures',
+          highlight: vehicle.bodyStyle === 'sedan' || vehicle.bodyStyle === 'hatchback',
+        })
+        break
+      case 'outdoor_escape':
+        if (vehicle.bodyStyle === 'suv' || vehicle.bodyStyle === 'truck') {
+          reasons.push({
+            icon: Check,
+            text: 'Adventure-ready stance with the clearance and presence your weekend escapes demand',
+            highlight: true,
+          })
+        }
+        if (hasFeature(vehicle, ['awd', '4wd', 'multi-terrain'])) {
+          reasons.push({
+            icon: Sparkles,
+            text: 'Selectable drive modes and traction tech keep you confident off the pavement',
+          })
+        }
+        break
+      case 'family_focused':
+        if (vehicle.seating >= 6) {
+          reasons.push({
+            icon: Check,
+            text: `Room for everyone with ${vehicle.seating}-passenger seating and smart storage touches`,
+            highlight: true,
+          })
+        }
+        if (vehicle.safetyRating >= 5) {
+          reasons.push({
+            icon: Check,
+            text: 'Top-tier safety ratings align with your “protect-the-crew” mindset',
+          })
+        }
+        break
+      case 'home_base':
+        reasons.push({
+          icon: Check,
+          text: 'Wide cargo opening and flexible seating make DIY runs and neighborhood drop-offs seamless',
+          highlight: vehicle.bodyStyle === 'suv' || vehicle.bodyStyle === 'truck',
+        })
+        break
+    }
+
+    switch (profile.vehicleEmotion) {
+      case 'security':
+        if (vehicle.safetyRating >= 5) {
+          reasons.push({
+            icon: Check,
+            text: 'Toyota Safety Sense and a 5-star safety pedigree reinforce that secure feeling you asked for',
+            highlight: true,
+          })
+        }
+        break
+      case 'efficiency':
+        if (vehicle.fuelType === 'hybrid' || vehicle.fuelType === 'ev' || vehicle.mpgCombined >= 35) {
+          reasons.push({
+            icon: Zap,
+            text: `Efficiency-first build delivering ${
+              vehicle.fuelType === 'ev' ? 'zero tailpipe emissions' : `${vehicle.mpgCombined} MPG combined`
+            } to protect your budget`,
+            highlight: true,
+          })
+        }
+        break
+      case 'freedom':
+        if (vehicle.tags.includes('adventure')) {
+          reasons.push({
+            icon: Sparkles,
+            text: 'Adventure credentials mean impromptu road trips are always on the table',
+            highlight: true,
+          })
+        }
+        break
+      case 'thrill':
+        reasons.push({
+          icon: Sparkles,
+          text: 'Bold styling and engaging drive dynamics keep the thrill dialed up on every commute',
+        })
+        break
+    }
+
+    switch (profile.spendingStyle) {
+      case 'home_project':
+        if (vehicle.bodyStyle === 'truck' || hasFeature(vehicle, ['towing', 'payload'])) {
+          reasons.push({
+            icon: Check,
+            text: 'Bed space and hauling muscle make weekend project runs effortless',
+            highlight: true,
+          })
+        }
+        break
+      case 'mini_road_trip':
+        reasons.push({
+          icon: Check,
+          text: 'Road-trip friendly cabin with comfort tech that keeps the whole crew happy mile after mile',
+          highlight: vehicle.bodyStyle === 'suv' || vehicle.bodyStyle === 'minivan',
+        })
+        break
+      case 'luxury_experience':
+        if (hasFeature(vehicle, ['leather', 'premium', 'panoramic'])) {
+          reasons.push({
+            icon: Sparkles,
+            text: 'Premium finishes and elevated touches match your city-night-out energy',
+            highlight: true,
+          })
+        }
+        break
+      case 'investing':
+        if (vehicle.mpgCombined >= 35 || vehicle.fuelType === 'hybrid' || vehicle.fuelType === 'ev') {
+          reasons.push({
+            icon: Zap,
+            text: 'Low operating costs and stellar efficiency keep your long-term plan on track',
+            highlight: true,
+          })
+        }
+        break
+    }
+
+    const narrative = profile.futureChapterNarrative.toLowerCase()
+    if (narrative) {
+      if (/(family|kid|child|new parent)/.test(narrative) && vehicle.tags.includes('family')) {
+        reasons.push({
+          icon: Check,
+          text: 'Family-first packaging with thoughtful safety tech for stroller-and-snacks life',
+        })
+      }
+      if (/(home|suburb|house)/.test(narrative) && hasFeature(vehicle, ['liftgate', 'power liftgate', 'cargo'])) {
+        reasons.push({
+          icon: Check,
+          text: 'Hands-free cargo access keeps new-home errands simple and stress-free',
+        })
+      }
+      if (/(budget|fuel|gas|payment)/.test(narrative) && (vehicle.fuelType === 'hybrid' || vehicle.fuelType === 'ev')) {
+        reasons.push({
+          icon: Zap,
+          text: 'Efficient powertrain eases fuel anxieties while you focus on bigger financial goals',
+        })
+      }
     }
   }
 
-  // Fuel efficiency
-  if (vehicle.fuelType === 'hybrid' || vehicle.fuelType === 'ev') {
-    if (vehicle.mpgCombined >= 40 || vehicle.fuelType === 'ev') {
-      reasons.push({
-        icon: Zap,
-        text: `Exceptional fuel efficiency ${vehicle.fuelType === 'ev' ? '(100% electric)' : `(${vehicle.mpgCombined} MPG combined)`}`,
-        highlight: vehicle.fuelType === 'ev',
-      })
-    } else {
-      reasons.push({
-        icon: Zap,
-        text: `Great fuel economy at ${vehicle.mpgCombined} MPG combined`,
-      })
-    }
-  } else if (vehicle.mpgCombined >= 25) {
+  if (vehicle.safetyRating === 5 && !reasons.some((reason) => reason.text.includes('5-star'))) {
     reasons.push({
       icon: Check,
-      text: `Good fuel economy at ${vehicle.mpgCombined} MPG combined`,
+      text: '5-star safety pedigree lets you drive with absolute confidence',
     })
   }
 
-  // Safety
-  if (vehicle.safetyRating === 5) {
+  if (vehicle.features.length > 0) {
     reasons.push({
       icon: Check,
-      text: 'Top 5-star safety rating for peace of mind',
+      text: `Signature Toyota features like ${vehicle.features[0]} keep daily life simple`,
     })
   }
 
-  // Body style match
-  if (profile && profile.preferredBodyStyle !== 'any' && vehicle.bodyStyle === profile.preferredBodyStyle) {
-    const styleNames: Record<string, string> = {
-      sedan: 'sedan',
-      suv: 'SUV',
-      truck: 'truck',
-      minivan: 'minivan',
-      hatchback: 'hatchback',
-    }
+  if (!reasons.some((reason) => reason.text.includes('reliability'))) {
     reasons.push({
       icon: Check,
-      text: `Matches your preference for a ${styleNames[vehicle.bodyStyle]}`,
-      highlight: true,
+      text: 'Backed by Toyota reliability and resale strength',
     })
   }
 
-  // Seating capacity
-  if (vehicle.seating >= 7) {
-    reasons.push({
-      icon: Check,
-      text: `Spacious ${vehicle.seating}-passenger seating for the whole family`,
-    })
-  } else if (vehicle.seating >= 5) {
-    reasons.push({
-      icon: Check,
-      text: `Comfortable ${vehicle.seating}-passenger seating`,
-    })
-  }
-
-  // Technology features
-  const hasTech = vehicle.features.some((f) =>
-    f.toLowerCase().includes('apple carplay') ||
-    f.toLowerCase().includes('android auto') ||
-    f.toLowerCase().includes('safety sense')
-  )
-  if (hasTech && profile?.lifestyleTags.includes('tech')) {
-    reasons.push({
-      icon: Check,
-      text: 'Advanced tech features including Apple CarPlay and Toyota Safety Sense',
-      highlight: true,
-    })
-  } else if (hasTech) {
-    reasons.push({
-      icon: Check,
-      text: 'Modern connectivity and safety technology',
-    })
-  }
-
-  // Lifestyle tag matches
-  if (profile && profile.lifestyleTags.length > 0) {
-    const matchingTags = vehicle.tags.filter((tag) =>
-      profile.lifestyleTags.includes(tag as any)
-    )
-
-    if (matchingTags.includes('family') && profile.lifestyleTags.includes('family')) {
-      reasons.push({
-        icon: Check,
-        text: 'Family-friendly with ample cargo space and safety features',
-        highlight: true,
-      })
-    }
-
-    if (matchingTags.includes('adventure') && profile.lifestyleTags.includes('adventure')) {
-      reasons.push({
-        icon: Check,
-        text: 'Built for adventure with off-road capability',
-        highlight: true,
-      })
-    }
-
-    if (matchingTags.includes('commuter') && profile.lifestyleTags.includes('commuter')) {
-      reasons.push({
-        icon: Check,
-        text: 'Ideal daily commuter with comfort and efficiency',
-        highlight: true,
-      })
-    }
-  }
-
-  // If we don't have enough reasons, add some generic ones
-  if (reasons.length < 3) {
-    if (!reasons.some(r => r.text.includes('reliability'))) {
-      reasons.push({
-        icon: Check,
-        text: 'Legendary Toyota reliability and resale value',
-      })
-    }
-
-    if (!reasons.some(r => r.text.includes('features')) && vehicle.features.length > 0) {
-      reasons.push({
-        icon: Check,
-        text: `Loaded with features including ${vehicle.features[0]}`,
-      })
-    }
-  }
-
-  // Limit to 5 reasons maximum
   return reasons.slice(0, 5)
 }
 
@@ -184,18 +211,14 @@ export default function ReasonPanel({ vehicle, profile }: ReasonPanelProps) {
           <li key={index} className="flex items-start gap-3">
             <div
               className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
-                reason.highlight
-                  ? 'bg-toyota-red text-white'
-                  : 'bg-green-100 text-green-700'
+                reason.highlight ? 'bg-toyota-red text-white' : 'bg-rose-100 text-rose-700'
               }`}
             >
               <reason.icon className="w-4 h-4" />
             </div>
             <span
               className={`text-sm leading-relaxed ${
-                reason.highlight
-                  ? 'font-medium text-toyota-black'
-                  : 'text-toyota-gray-dark'
+                reason.highlight ? 'font-medium text-toyota-black' : 'text-toyota-gray-dark'
               }`}
             >
               {reason.text}

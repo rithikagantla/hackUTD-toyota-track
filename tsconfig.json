@@ -25,7 +25,12 @@
     /* Path aliases */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "react": ["./src/types/react"],
+      "react/jsx-runtime": ["./src/types/react-jsx-runtime"],
+      "react/jsx-dev-runtime": ["./src/types/react-jsx-runtime"],
+      "react-router-dom": ["./src/types/react-router-dom"],
+      "framer-motion": ["./src/types/framer-motion"]
     }
   },
   "include": ["src"],

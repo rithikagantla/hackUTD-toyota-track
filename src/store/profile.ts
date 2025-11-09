@@ -1,21 +1,34 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { FuelType, BodyStyle } from '../data/vehicles'
 
-export type DecisionStyle = 'lease' | 'finance' | 'undecided'
-export type LifestyleTag = 'commuter' | 'family' | 'adventure' | 'eco' | 'tech'
-export type CommuteIntensity = 'low' | 'medium' | 'high'
+export type WeekendVibe =
+  | 'city_adventures'
+  | 'outdoor_escape'
+  | 'family_focused'
+  | 'home_base'
+
+export type VehicleEmotion = 'security' | 'efficiency' | 'freedom' | 'thrill'
+
+export type SpendingStyle =
+  | 'home_project'
+  | 'mini_road_trip'
+  | 'luxury_experience'
+  | 'investing'
+
+export interface PsychographicInsights {
+  lifeStage?: string
+  primaryGoal?: string
+  vehicleNeeds?: string[]
+  financialSentiment?: string
+  keyConcerns?: string[]
+}
 
 export interface UserProfile {
-  // Quiz responses
-  budgetMonthly: number // Target monthly payment
-  preferredFuelType: FuelType | 'any'
-  preferredBodyStyle: BodyStyle | 'any'
-  commuteIntensity: CommuteIntensity
-  lifestyleTags: LifestyleTag[]
-  decisionStyle: DecisionStyle
-
-  // Metadata
+  weekendVibe: WeekendVibe | null
+  vehicleEmotion: VehicleEmotion | null
+  spendingStyle: SpendingStyle | null
+  futureChapterNarrative: string
+  insights: PsychographicInsights | null
   completed: boolean
   completedAt?: Date
 }
@@ -28,12 +41,11 @@ interface ProfileStore {
 }
 
 const defaultProfile: UserProfile = {
-  budgetMonthly: 400,
-  preferredFuelType: 'any',
-  preferredBodyStyle: 'any',
-  commuteIntensity: 'medium',
-  lifestyleTags: [],
-  decisionStyle: 'undecided',
+  weekendVibe: null,
+  vehicleEmotion: null,
+  spendingStyle: null,
+  futureChapterNarrative: '',
+  insights: null,
   completed: false,
 }
 
