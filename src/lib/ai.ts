@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { Vehicle } from '../data/vehicles'
-import { UserProfile } from '../store/profile'
+import { UserProfile, WeekendVibe, VehicleEmotion, SpendingStyle } from '../store/profile'
 import { vehicles, searchVehicles } from '../data/vehicles'
 import { estimateFinance, formatCurrency, formatMonthly } from './finance'
 
@@ -18,6 +18,64 @@ interface ChatContext {
   vehicles: Vehicle[]
 }
 
+const weekendLabel: Record<Exclude<WeekendVibe, null>, string> = {
+  city_adventures: 'City adventures',
+  outdoor_escape: 'Outdoor escape',
+  family_focused: 'Family-focused',
+  home_base: 'Home base',
+}
+
+const emotionLabel: Record<VehicleEmotion, string> = {
+  security: 'Security',
+  efficiency: 'Efficiency',
+  freedom: 'Freedom',
+  thrill: 'Thrill',
+}
+
+const spendingLabel: Record<SpendingStyle, string> = {
+  home_project: 'Home project hero',
+  mini_road_trip: 'Mini road-trip captain',
+  luxury_experience: 'Luxury experience',
+  investing: 'Stacking the future',
+}
+
+function summarizeProfile(profile: UserProfile): string {
+  if (!profile.completed) {
+    return 'User has not completed profile quiz yet.'
+  }
+
+  const lines: string[] = []
+
+  if (profile.weekendVibe) {
+    lines.push(`- Weekend vibe: ${weekendLabel[profile.weekendVibe]}`)
+  }
+  if (profile.vehicleEmotion) {
+    lines.push(`- Desired feeling: ${emotionLabel[profile.vehicleEmotion]}`)
+  }
+  if (profile.spendingStyle) {
+    lines.push(`- $500 Saturday plan: ${spendingLabel[profile.spendingStyle]}`)
+  }
+  if (profile.futureChapterNarrative) {
+    const trimmed = profile.futureChapterNarrative.trim()
+    const snippet = trimmed.length > 160 ? `${trimmed.slice(0, 157)}...` : trimmed
+    lines.push(`- Future chapter: ${snippet}`)
+  }
+
+  if (profile.insights) {
+    const { lifeStage, primaryGoal, vehicleNeeds, financialSentiment } = profile.insights
+    if (lifeStage) lines.push(`- Life stage: ${lifeStage}`)
+    if (primaryGoal) lines.push(`- Primary goal: ${primaryGoal}`)
+    if (vehicleNeeds && vehicleNeeds.length > 0) lines.push(`- Vehicle needs: ${vehicleNeeds.join(', ')}`)
+    if (financialSentiment) lines.push(`- Financial sentiment: ${financialSentiment}`)
+  }
+
+  if (lines.length === 0) {
+    return 'User completed the psychographic quiz but did not provide additional context.'
+  }
+
+  return `User Psychographic Profile:\n${lines.join('\n')}`
+}
+
 /**
  * MOCK AI - Rule-based responses
  */
@@ -31,7 +89,7 @@ function generateMockResponse(message: string): string {
 
   // Quiz/Profile
   if (lowerMessage.includes('quiz') || lowerMessage.includes('profile')) {
-    return "Take our quick profile quiz to get personalized vehicle recommendations! It only takes a minute and helps us understand your budget, lifestyle, and preferences. You can start the quiz from the navigation menu."
+    return "Jump into our psychographic onboarding! In just a few questions we'll capture your weekend vibe, the emotion you crave from your next Toyota, and the life chapter you're writing—then turn it into spot-on recommendations. You can start the experience from the navigation menu."
   }
 
   // Hybrid recommendations
@@ -133,12 +191,12 @@ It's perfect for eco-conscious drivers who want SUV versatility without gas. Fed
   // Default fallback
   return `I'd be happy to help! I can assist with:
 
-- **Vehicle recommendations** - Tell me your budget and preferences
-- **Comparisons** - Compare any two Toyota models
-- **Financing info** - Explain lease vs. finance options
-- **Feature details** - Learn about safety, tech, and performance
+- **Vehicle recommendations** – Share your vibe or goals and I'll curate Toyota matches
+- **Comparisons** – Compare any two Toyota models side-by-side
+- **Ownership insights** – Break down lease, finance, or EV charging questions
+- **Feature deep dives** – Learn about safety tech, infotainment, and performance
 
-Try asking: "Best hybrids under $400/mo" or "Compare Camry vs. RAV4" or "Tell me about the Prius"`
+Try asking: \"Which Toyota fits an adventurous family?\", \"Compare RAV4 vs. Highlander\", or \"How efficient is the Prius Prime?\"`
 }
 
 /**
@@ -160,11 +218,7 @@ You are a helpful Toyota vehicle recommendation assistant called Toyota Nexus.
 
 Available vehicles: ${context.vehicles.length} Toyota models including sedans, SUVs, trucks, hybrids, and electric vehicles.
 
-${context.profile?.completed ? `User Profile:
-- Budget: ${formatCurrency(context.profile.budgetMonthly)}/month
-- Fuel preference: ${context.profile.preferredFuelType}
-- Body style: ${context.profile.preferredBodyStyle}
-- Lifestyle: ${context.profile.lifestyleTags.join(', ')}` : 'User has not completed profile quiz yet.'}
+${context.profile ? summarizeProfile(context.profile) : 'User has not completed profile quiz yet.'}
 
 Some popular vehicles:
 - Camry: Midsize sedan, 32 MPG, $28,400
@@ -217,22 +271,35 @@ export async function generateAIResponse(
  * Get quick suggest chips
  */
 export function getQuickSuggestions(profile?: UserProfile): string[] {
-  const suggestions = [
-    "Best hybrids under $400/mo",
-    "Compare Camry vs. Corolla",
-    "Explain lease vs finance",
-    "Family-friendly SUVs",
-    "Most fuel-efficient vehicles",
+  const baseSuggestions = [
+    'Compare Camry vs. Corolla',
+    'Explain Toyota Safety Sense',
+    'What Toyota EV options exist?',
+    'How does leasing differ from financing?',
   ]
 
-  if (profile?.completed) {
-    if (profile.preferredFuelType === 'hybrid' || profile.lifestyleTags.includes('eco')) {
-      suggestions.unshift("Show me eco-friendly options")
-    }
-    if (profile.preferredBodyStyle === 'suv') {
-      suggestions.unshift("Best SUVs for my budget")
-    }
+  if (!profile?.completed) {
+    return baseSuggestions.slice(0, 4)
   }
 
-  return suggestions.slice(0, 4)
+  const dynamicSuggestions: string[] = []
+
+  if (profile.weekendVibe === 'outdoor_escape' || profile.vehicleEmotion === 'freedom') {
+    dynamicSuggestions.push('Show me adventure-ready Toyotas')
+  }
+
+  if (profile.weekendVibe === 'family_focused' || /family|kid|parent/i.test(profile.futureChapterNarrative)) {
+    dynamicSuggestions.push('Best Toyota for a growing family')
+  }
+
+  if (profile.vehicleEmotion === 'efficiency' || profile.spendingStyle === 'investing') {
+    dynamicSuggestions.push('Most efficient Toyota hybrids right now')
+  }
+
+  if (profile.spendingStyle === 'luxury_experience' || profile.vehicleEmotion === 'thrill') {
+    dynamicSuggestions.push('Premium Toyota interiors worth seeing')
+  }
+
+  const combined = [...dynamicSuggestions, ...baseSuggestions]
+  return Array.from(new Set(combined)).slice(0, 4)
 }

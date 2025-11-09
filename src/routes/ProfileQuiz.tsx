@@ -1,68 +1,83 @@
-import { useState } from 'react'
+import { type ChangeEvent, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ChevronRight, ChevronLeft, Check } from 'lucide-react'
-import { useProfileStore, LifestyleTag, CommuteIntensity, DecisionStyle } from '../store/profile'
+import { useProfileStore, WeekendVibe, VehicleEmotion, SpendingStyle } from '../store/profile'
 import Hero from '../components/layout/Hero'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
-import Slider from '../components/ui/Slider'
-import { formatCurrency } from '../lib/finance'
 import { motion, AnimatePresence } from 'framer-motion'
 
-const TOTAL_STEPS = 6
+const TOTAL_STEPS = 4
+const MIN_FUTURE_CHAPTER_LENGTH = 40
 
 export default function ProfileQuiz() {
   const navigate = useNavigate()
   const { profile, updateProfile, completeProfile } = useProfileStore()
-  const [currentStep, setCurrentStep] = useState(1)
+  const [currentStep, setCurrentStep] = useState<number>(1)
 
-  const [formData, setFormData] = useState({
-    budgetMonthly: profile.budgetMonthly,
-    preferredFuelType: profile.preferredFuelType,
-    preferredBodyStyle: profile.preferredBodyStyle,
-    commuteIntensity: profile.commuteIntensity,
-    lifestyleTags: profile.lifestyleTags,
-    decisionStyle: profile.decisionStyle,
+  type FormState = {
+    weekendVibe: WeekendVibe | null
+    vehicleEmotion: VehicleEmotion | null
+    spendingStyle: SpendingStyle | null
+    futureChapterNarrative: string
+  }
+
+  const [formData, setFormData] = useState<FormState>({
+    weekendVibe: profile.weekendVibe ?? null,
+    vehicleEmotion: profile.vehicleEmotion ?? null,
+    spendingStyle: profile.spendingStyle ?? null,
+    futureChapterNarrative: profile.futureChapterNarrative ?? '',
   })
 
   const updateFormData = <K extends keyof typeof formData>(
     key: K,
     value: typeof formData[K]
   ) => {
-    setFormData((prev) => ({ ...prev, [key]: value }))
-  }
-
-  const toggleLifestyleTag = (tag: LifestyleTag) => {
-    const tags = formData.lifestyleTags.includes(tag)
-      ? formData.lifestyleTags.filter((t) => t !== tag)
-      : [...formData.lifestyleTags, tag]
-    updateFormData('lifestyleTags', tags)
+    setFormData((prevState: FormState) => ({ ...prevState, [key]: value }))
   }
 
   const handleNext = () => {
     if (currentStep < TOTAL_STEPS) {
-      setCurrentStep((prev) => prev + 1)
-    } else {
-      // Submit quiz
-      updateProfile(formData)
-      completeProfile()
-      navigate('/app/quiz-results')
+      setCurrentStep((prevStep: number) => prevStep + 1)
+      return
     }
+
+    updateProfile({
+      ...formData,
+      futureChapterNarrative: formData.futureChapterNarrative.trim(),
+    })
+    completeProfile()
+    navigate('/app/quiz-results')
   }
 
   const handleBack = () => {
     if (currentStep > 1) {
-      setCurrentStep((prev) => prev - 1)
+      setCurrentStep((prevStep: number) => prevStep - 1)
     }
   }
 
   const progress = (currentStep / TOTAL_STEPS) * 100
 
+  const canProceed = useMemo(() => {
+    switch (currentStep) {
+      case 1:
+        return Boolean(formData.weekendVibe)
+      case 2:
+        return Boolean(formData.vehicleEmotion)
+      case 3:
+        return Boolean(formData.spendingStyle)
+      case 4:
+        return formData.futureChapterNarrative.trim().length >= MIN_FUTURE_CHAPTER_LENGTH
+      default:
+        return true
+    }
+  }, [currentStep, formData])
+
   return (
     <div>
       <Hero
-        title="Find Your Perfect Match"
-        subtitle="Answer a few questions to get personalized vehicle recommendations"
+        title="Map Your Next Chapter"
+        subtitle="Lean into the vibes, paint the story, and we'll sculpt the perfect Toyota companion"
         compact
       />
 
@@ -96,53 +111,103 @@ export default function ProfileQuiz() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                {/* Step 1: Budget */}
+                {/* Step 1: Weekend Vibe */}
                 {currentStep === 1 && (
                   <div>
                     <h2 className="text-2xl font-semibold text-toyota-black mb-2">
-                      What's your target monthly payment?
+                      What does your typical weekend look like?
                     </h2>
                     <p className="text-toyota-gray-dark mb-8">
-                      This helps us recommend vehicles within your budget
+                      Choose the vibe that feels most like your off-duty rhythm
                     </p>
-                    <Slider
-                      min={200}
-                      max={1000}
-                      step={50}
-                      value={formData.budgetMonthly}
-                      onChange={(e) =>
-                        updateFormData('budgetMonthly', Number(e.target.value))
-                      }
-                      formatValue={(v) => `${formatCurrency(v)}/mo`}
-                      showValue
-                    />
-                    <div className="mt-4 text-sm text-toyota-gray-dark">
-                      Selected: {formatCurrency(formData.budgetMonthly)}/month
+                    <div className="space-y-4">
+                      {[
+                        {
+                          value: 'city_adventures' as WeekendVibe,
+                          label: 'City adventures',
+                          desc: 'Brunch spots, pop-up exhibits, late-night detours.',
+                        },
+                        {
+                          value: 'outdoor_escape' as WeekendVibe,
+                          label: 'Outdoor escape',
+                          desc: 'Trailheads, summit selfies, fresh air therapy.',
+                        },
+                        {
+                          value: 'family_focused' as WeekendVibe,
+                          label: 'Family-focused',
+                          desc: 'Sideline cheers, snack runs, grandparents’ house.',
+                        },
+                        {
+                          value: 'home_base' as WeekendVibe,
+                          label: 'Home base',
+                          desc: 'DIY projects, neighborhood hangs, easy drives.',
+                        },
+                      ].map((option) => (
+                        <button
+                          key={option.value}
+                          onClick={() => updateFormData('weekendVibe', option.value)}
+                          className={`w-full p-5 border-2 rounded-lg transition-all text-left ${
+                            formData.weekendVibe === option.value
+                              ? 'border-toyota-red bg-toyota-red/5 shadow-md'
+                              : 'border-gray-200 hover:border-toyota-red/50'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <div className="font-semibold text-toyota-black">
+                                {option.label}
+                              </div>
+                              <div className="text-sm text-toyota-gray-dark">
+                                {option.desc}
+                              </div>
+                            </div>
+                            {formData.weekendVibe === option.value && (
+                              <Check className="w-5 h-5 text-toyota-red shrink-0" />
+                            )}
+                          </div>
+                        </button>
+                      ))}
                     </div>
                   </div>
                 )}
 
-                {/* Step 2: Fuel Type */}
+                {/* Step 2: Vehicle Emotion */}
                 {currentStep === 2 && (
                   <div>
                     <h2 className="text-2xl font-semibold text-toyota-black mb-2">
-                      Preferred fuel type?
+                      When you picture your next ride, what feeling hits first?
                     </h2>
                     <p className="text-toyota-gray-dark mb-8">
-                      Choose your preferred powertrain or select "Any"
+                      Let your gut talk—we'll translate it into vehicle DNA
                     </p>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {[
-                        { value: 'any' as const, label: 'Any', desc: 'Show me all options' },
-                        { value: 'gas' as const, label: 'Gasoline', desc: 'Traditional fuel' },
-                        { value: 'hybrid' as const, label: 'Hybrid', desc: 'Best fuel economy' },
-                        { value: 'ev' as const, label: 'Electric', desc: 'Zero emissions' },
+                        {
+                          value: 'security' as VehicleEmotion,
+                          label: 'Security',
+                          desc: 'I want to feel safe, grounded, and in control.',
+                        },
+                        {
+                          value: 'efficiency' as VehicleEmotion,
+                          label: 'Efficiency',
+                          desc: 'Smart, practical, eco-conscious—the brainy choice.',
+                        },
+                        {
+                          value: 'freedom' as VehicleEmotion,
+                          label: 'Freedom',
+                          desc: 'Adventure-ready, unconstrained, always game.',
+                        },
+                        {
+                          value: 'thrill' as VehicleEmotion,
+                          label: 'Thrill',
+                          desc: 'Performance, energy, grins per mile.',
+                        },
                       ].map((option) => (
                         <button
                           key={option.value}
-                          onClick={() => updateFormData('preferredFuelType', option.value)}
+                          onClick={() => updateFormData('vehicleEmotion', option.value)}
                           className={`p-4 border-2 rounded-lg transition-all text-left ${
-                            formData.preferredFuelType === option.value
+                            formData.vehicleEmotion === option.value
                               ? 'border-toyota-red bg-toyota-red/5'
                               : 'border-gray-200 hover:border-toyota-red/50'
                           }`}
@@ -152,7 +217,7 @@ export default function ProfileQuiz() {
                               <div className="font-semibold text-toyota-black">{option.label}</div>
                               <div className="text-sm text-toyota-gray-dark">{option.desc}</div>
                             </div>
-                            {formData.preferredFuelType === option.value && (
+                            {formData.vehicleEmotion === option.value && (
                               <Check className="w-5 h-5 text-toyota-red" />
                             )}
                           </div>
@@ -162,36 +227,50 @@ export default function ProfileQuiz() {
                   </div>
                 )}
 
-                {/* Step 3: Body Style */}
+                {/* Step 3: Spending Style */}
                 {currentStep === 3 && (
                   <div>
                     <h2 className="text-2xl font-semibold text-toyota-black mb-2">
-                      Preferred body style?
+                      You get a free Saturday and $500. What happens?
                     </h2>
                     <p className="text-toyota-gray-dark mb-8">
-                      What type of vehicle fits your lifestyle?
+                      Pick the storyline that feels most like you—or how you want to be
                     </p>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {[
-                        { value: 'any' as const, label: 'Any', desc: 'No preference' },
-                        { value: 'sedan' as const, label: 'Sedan', desc: 'Comfortable & efficient' },
-                        { value: 'suv' as const, label: 'SUV', desc: 'Spacious & versatile' },
-                        { value: 'truck' as const, label: 'Truck', desc: 'Powerful & capable' },
-                        { value: 'minivan' as const, label: 'Minivan', desc: 'Maximum space' },
-                        { value: 'hatchback' as const, label: 'Hatchback', desc: 'Sporty & practical' },
+                        {
+                          value: 'home_project' as SpendingStyle,
+                          label: 'Home project hero',
+                          desc: 'Home Depot run, IKEA maze, the trunk’s packed with possibilities.',
+                        },
+                        {
+                          value: 'mini_road_trip' as SpendingStyle,
+                          label: 'Mini road-trip captain',
+                          desc: 'Spontaneous getaway with the crew and an overstuffed cooler.',
+                        },
+                        {
+                          value: 'luxury_experience' as SpendingStyle,
+                          label: 'Luxury experience',
+                          desc: 'Dress up, dine out, go all-in on the city glow-up.',
+                        },
+                        {
+                          value: 'investing' as SpendingStyle,
+                          label: 'Stacking the future',
+                          desc: 'Straight into savings, investments, or debt-free dreams.',
+                        },
                       ].map((option) => (
                         <button
                           key={option.value}
-                          onClick={() => updateFormData('preferredBodyStyle', option.value)}
+                          onClick={() => updateFormData('spendingStyle', option.value)}
                           className={`p-4 border-2 rounded-lg transition-all text-left ${
-                            formData.preferredBodyStyle === option.value
+                            formData.spendingStyle === option.value
                               ? 'border-toyota-red bg-toyota-red/5'
                               : 'border-gray-200 hover:border-toyota-red/50'
                           }`}
                         >
                           <div className="flex items-start justify-between mb-1">
                             <div className="font-semibold text-toyota-black">{option.label}</div>
-                            {formData.preferredBodyStyle === option.value && (
+                            {formData.spendingStyle === option.value && (
                               <Check className="w-5 h-5 text-toyota-red" />
                             )}
                           </div>
@@ -202,119 +281,29 @@ export default function ProfileQuiz() {
                   </div>
                 )}
 
-                {/* Step 4: Commute */}
+                {/* Step 4: Future Chapter */}
                 {currentStep === 4 && (
                   <div>
                     <h2 className="text-2xl font-semibold text-toyota-black mb-2">
-                      How much do you drive?
+                      Describe the next chapter of your life
                     </h2>
                     <p className="text-toyota-gray-dark mb-8">
-                      Understanding your driving habits helps us recommend the right vehicle
+                      What are you building toward in the next 3-5 years, and how should your next vehicle boost that story?
                     </p>
-                    <div className="space-y-4">
-                      {[
-                        { value: 'low' as CommuteIntensity, label: 'Light Driver', desc: 'Less than 5,000 miles/year' },
-                        { value: 'medium' as CommuteIntensity, label: 'Average Driver', desc: '5,000-15,000 miles/year' },
-                        { value: 'high' as CommuteIntensity, label: 'Heavy Driver', desc: 'More than 15,000 miles/year' },
-                      ].map((option) => (
-                        <button
-                          key={option.value}
-                          onClick={() => updateFormData('commuteIntensity', option.value)}
-                          className={`w-full p-4 border-2 rounded-lg transition-all text-left ${
-                            formData.commuteIntensity === option.value
-                              ? 'border-toyota-red bg-toyota-red/5'
-                              : 'border-gray-200 hover:border-toyota-red/50'
-                          }`}
-                        >
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <div className="font-semibold text-toyota-black">{option.label}</div>
-                              <div className="text-sm text-toyota-gray-dark">{option.desc}</div>
-                            </div>
-                            {formData.commuteIntensity === option.value && (
-                              <Check className="w-5 h-5 text-toyota-red" />
-                            )}
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Step 5: Lifestyle Tags */}
-                {currentStep === 5 && (
-                  <div>
-                    <h2 className="text-2xl font-semibold text-toyota-black mb-2">
-                      What matters most to you?
-                    </h2>
-                    <p className="text-toyota-gray-dark mb-8">
-                      Select all that apply (you can choose multiple)
-                    </p>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      {[
-                        { value: 'commuter' as LifestyleTag, label: 'Daily Commuter', desc: 'Reliable for work' },
-                        { value: 'family' as LifestyleTag, label: 'Family', desc: 'Space & safety' },
-                        { value: 'adventure' as LifestyleTag, label: 'Adventure', desc: 'Off-road ready' },
-                        { value: 'eco' as LifestyleTag, label: 'Eco-Friendly', desc: 'Low emissions' },
-                        { value: 'tech' as LifestyleTag, label: 'Technology', desc: 'Latest features' },
-                      ].map((option) => (
-                        <button
-                          key={option.value}
-                          onClick={() => toggleLifestyleTag(option.value)}
-                          className={`p-4 border-2 rounded-lg transition-all text-left ${
-                            formData.lifestyleTags.includes(option.value)
-                              ? 'border-toyota-red bg-toyota-red/5'
-                              : 'border-gray-200 hover:border-toyota-red/50'
-                          }`}
-                        >
-                          <div className="flex items-start justify-between mb-1">
-                            <div className="font-semibold text-toyota-black">{option.label}</div>
-                            {formData.lifestyleTags.includes(option.value) && (
-                              <Check className="w-5 h-5 text-toyota-red" />
-                            )}
-                          </div>
-                          <div className="text-xs text-toyota-gray-dark">{option.desc}</div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Step 6: Decision Style */}
-                {currentStep === 6 && (
-                  <div>
-                    <h2 className="text-2xl font-semibold text-toyota-black mb-2">
-                      How do you prefer to pay?
-                    </h2>
-                    <p className="text-toyota-gray-dark mb-8">
-                      This helps us show you the most relevant payment options
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        { value: 'finance' as DecisionStyle, label: 'Finance to Own', desc: 'Build equity and own the vehicle' },
-                        { value: 'lease' as DecisionStyle, label: 'Lease', desc: 'Lower payments, newer vehicle every few years' },
-                        { value: 'undecided' as DecisionStyle, label: "I'm Not Sure", desc: 'Show me both options' },
-                      ].map((option) => (
-                        <button
-                          key={option.value}
-                          onClick={() => updateFormData('decisionStyle', option.value)}
-                          className={`w-full p-4 border-2 rounded-lg transition-all text-left ${
-                            formData.decisionStyle === option.value
-                              ? 'border-toyota-red bg-toyota-red/5'
-                              : 'border-gray-200 hover:border-toyota-red/50'
-                          }`}
-                        >
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <div className="font-semibold text-toyota-black">{option.label}</div>
-                              <div className="text-sm text-toyota-gray-dark">{option.desc}</div>
-                            </div>
-                            {formData.decisionStyle === option.value && (
-                              <Check className="w-5 h-5 text-toyota-red" />
-                            )}
-                          </div>
-                        </button>
-                      ))}
+                    <textarea
+                      value={formData.futureChapterNarrative}
+                      onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                        updateFormData('futureChapterNarrative', event.target.value)
+                      }
+                      rows={6}
+                      placeholder="In your own words, paint the picture..."
+                      className="w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-toyota-red focus:border-transparent p-4 text-base text-toyota-black placeholder:text-gray-400"
+                    />
+                    <div className="text-xs text-toyota-gray-dark mt-3 flex items-center justify-between">
+                      <span>Aim for at least a few sentences so we can pull out the good stuff.</span>
+                      <span>
+                        {Math.max(formData.futureChapterNarrative.trim().length, 0)} / {MIN_FUTURE_CHAPTER_LENGTH}
+                      </span>
                     </div>
                   </div>
                 )}
@@ -331,10 +320,10 @@ export default function ProfileQuiz() {
                 <ChevronLeft className="w-4 h-4 mr-2" />
                 Back
               </Button>
-              <Button onClick={handleNext}>
+              <Button onClick={handleNext} disabled={!canProceed}>
                 {currentStep === TOTAL_STEPS ? (
                   <>
-                    Complete Quiz
+                    Lock It In
                     <Check className="w-4 h-4 ml-2" />
                   </>
                 ) : (
