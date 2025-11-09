@@ -233,16 +233,20 @@ export default function QuizResults() {
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 {profileHighlights.length > 0 ? (
-                  profileHighlights.map((item, index) => (
-                    <div key={index} className="p-4 border border-gray-200 rounded-lg bg-white/70">
-                      <div className="text-sm uppercase tracking-wide text-toyota-red font-semibold mb-1">
-                        {item.label}
+                  profileHighlights.map((item, index) => {
+                    if (!item) return null
+                    const description = 'tagline' in item ? item.tagline : 'vibe' in item ? item.vibe : 'impulse' in item ? item.impulse : ''
+                    return (
+                      <div key={index} className="p-4 border border-gray-200 rounded-lg bg-white/70">
+                        <div className="text-sm uppercase tracking-wide text-toyota-red font-semibold mb-1">
+                          {item.label}
+                        </div>
+                        <div className="text-sm text-toyota-gray-dark leading-relaxed">
+                          {description}
+                        </div>
                       </div>
-                      <div className="text-sm text-toyota-gray-dark leading-relaxed">
-                        {item.tagline ?? item.vibe ?? item.impulse}
-                      </div>
-                    </div>
-                  ))
+                    )
+                  })
                 ) : (
                   <div className="text-sm text-toyota-gray-dark">
                     Tell us more about you in the quiz to unlock tailored insights.

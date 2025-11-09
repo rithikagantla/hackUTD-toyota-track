@@ -26,7 +26,7 @@ export default function VehicleDetail() {
       {/* Back Button */}
       <div className="bg-toyota-gray-light border-b border-gray-200">
         <div className="container-custom py-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+          <Button variant="ghost" size="sm" onClick={() => navigate(-1 as any)}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Explore
           </Button>

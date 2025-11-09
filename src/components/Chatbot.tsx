@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { MessageSquare, Send, X, Loader2, Trash2 } from 'lucide-react'
+import { MessageSquare, Send, X, Loader2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Button from './ui/Button'
 import Card from './ui/Card'
@@ -58,11 +58,6 @@ export default function Chatbot() {
   useEffect(() => {
     scrollToBottom()
   }, [messages])
-
-  const clearConversation = () => {
-    setMessages([])
-    localStorage.removeItem(CHAT_HISTORY_KEY)
-  }
 
   const handleSend = async (message?: string) => {
     const textToSend = message || input.trim()
@@ -173,29 +168,15 @@ export default function Chatbot() {
                     <p className="text-xs text-white/80">AI Assistant</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  {messages.length > 0 && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={clearConversation}
-                      className="!text-white hover:bg-white/10 !p-2"
-                      aria-label="Clear conversation"
-                      title="Clear conversation"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  )}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setIsOpen(false)}
-                    className="!text-white hover:bg-white/10 !p-2"
-                    aria-label="Close chat"
-                  >
-                    <X className="w-5 h-5" />
-                  </Button>
-                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsOpen(false)}
+                  className="!text-white hover:bg-white/10 !p-2"
+                  aria-label="Close chat"
+                >
+                  <X className="w-5 h-5" />
+                </Button>
               </div>
 
               {/* Messages */}

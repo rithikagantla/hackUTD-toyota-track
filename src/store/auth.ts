@@ -12,15 +12,18 @@ interface AuthStore {
   user: User | null
   isAuthenticated: boolean
   isLoading: boolean
-  login: (email: string, password: string) => Promise<boolean>
-  signup: (email: string, password: string, name: string) => Promise<boolean>
-  logout: () => void
-  setLoading: (loading: boolean) => void
+  // Simple email-based login
+  login: (email: string, name?: string) => Promise<void>
+  signup: (email: string, name?: string) => Promise<void>
+  logout: () => Promise<void>
+  setFromAuth0: (p: {
+    isAuthenticated: boolean
+    isLoading: boolean
+    email?: string | null
+    name?: string | null
+    sub?: string | null
+  }) => void
 }
-
-// Simulate async auth (in production, this would call an API)
-const simulateAuth = (duration: number = 1500) =>
-  new Promise<void>((resolve) => setTimeout(resolve, duration))
 
 export const useAuthStore = create<AuthStore>()(
   persist(
@@ -29,50 +32,57 @@ export const useAuthStore = create<AuthStore>()(
       isAuthenticated: false,
       isLoading: false,
 
-      setLoading: (loading) => set({ isLoading: loading }),
-
-      login: async (email: string, password: string) => {
-        set({ isLoading: true })
-        await simulateAuth()
-
-        // Simple validation
-        if (email && password.length >= 6) {
-          const user: User = {
-            id: Math.random().toString(36).substr(2, 9),
-            email,
-            name: email.split('@')[0],
-            createdAt: new Date(),
-          }
-          set({ user, isAuthenticated: true, isLoading: false })
-          return true
+      // Simple email-based login - no Auth0 required
+      login: async (email: string, name?: string) => {
+        const user: User = {
+          id: email,
+          email,
+          name: name || email.split('@')[0],
+          createdAt: new Date(),
         }
-
-        set({ isLoading: false })
-        return false
+        set({
+          user,
+          isAuthenticated: true,
+          isLoading: false,
+        })
       },
 
-      signup: async (email: string, password: string, name: string) => {
-        set({ isLoading: true })
-        await simulateAuth()
-
-        // Simple validation
-        if (email && password.length >= 6 && name) {
-          const user: User = {
-            id: Math.random().toString(36).substr(2, 9),
-            email,
-            name,
-            createdAt: new Date(),
-          }
-          set({ user, isAuthenticated: true, isLoading: false })
-          return true
+      signup: async (email: string, name?: string) => {
+        const user: User = {
+          id: email,
+          email,
+          name: name || email.split('@')[0],
+          createdAt: new Date(),
         }
-
-        set({ isLoading: false })
-        return false
+        set({
+          user,
+          isAuthenticated: true,
+          isLoading: false,
+        })
       },
 
-      logout: () => {
-        set({ user: null, isAuthenticated: false })
+      logout: async () => {
+        set({
+          user: null,
+          isAuthenticated: false,
+          isLoading: false,
+        })
+      },
+
+      // Kept for compatibility with Auth0 bridge if needed
+      setFromAuth0: ({ isAuthenticated, isLoading, email, name, sub }) => {
+        set({
+          isAuthenticated,
+          isLoading,
+          user: isAuthenticated
+            ? {
+                id: sub || email || 'user',
+                email: email || 'unknown@example.com',
+                name: name || 'User',
+                createdAt: new Date(),
+              }
+            : null,
+        })
       },
     }),
     {

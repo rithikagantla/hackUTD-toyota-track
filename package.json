@@ -12,6 +12,7 @@
     "api:start": "node --env-file=.env server.js"
   },
   "dependencies": {
+    "@auth0/auth0-react": "^2.8.0",
     "@google/genai": "^1.29.0",
     "@google/generative-ai": "^0.24.1",
     "all": "^0.0.0",

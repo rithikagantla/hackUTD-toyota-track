@@ -1,11 +1,11 @@
 import { BrowserRouter, Routes, Route, Outlet, useLocation, Navigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useState } from 'react'
+import { useAuth0 } from '@auth0/auth0-react'
 import NavBar from './components/layout/NavBar'
 import Footer from './components/layout/Footer'
 import Chatbot from './components/Chatbot'
 import LoadingScreen from './components/LoadingScreen'
-import { useAuthStore } from './store/auth'
 
 // Public routes
 import Landing from './routes/Landing'
@@ -22,7 +22,13 @@ import About from './routes/About'
 
 // Protected route wrapper
 function ProtectedRoute() {
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, isLoading } = useAuth0()
+
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-toyota-red"></div>
+    </div>
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />

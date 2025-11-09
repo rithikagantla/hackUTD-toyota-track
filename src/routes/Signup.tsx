@@ -1,46 +1,26 @@
-import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { Mail, Lock, User, Loader2, AlertCircle, CheckCircle } from 'lucide-react'
-import { useAuthStore } from '../store/auth'
+import { useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { Loader2 } from 'lucide-react'
+import { useAuth0 } from '@auth0/auth0-react'
 import Button from '../components/ui/Button'
 
 export default function Signup() {
-  const navigate = useNavigate()
-  const { signup, isLoading } = useAuthStore()
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [error, setError] = useState('')
+  const { loginWithRedirect, isLoading, isAuthenticated } = useAuth0()
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-
-    if (!name || !email || !password || !confirmPassword) {
-      setError('Please fill in all fields')
-      return
+  useEffect(() => {
+    if (isAuthenticated) {
+      window.location.href = '/app'
     }
+  }, [isAuthenticated])
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters')
-      return
-    }
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match')
-      return
-    }
-
-    const success = await signup(email, password, name)
-    if (success) {
-      navigate('/app')
-    } else {
-      setError('Failed to create account. Please try again.')
-    }
+  const handleSignup = async () => {
+    await loginWithRedirect({
+      appState: { returnTo: '/app' },
+      authorizationParams: {
+        screen_hint: 'signup',
+      },
+    })
   }
-
-  const passwordStrength = password.length >= 6 ? 'strong' : password.length >= 4 ? 'medium' : 'weak'
 
   return (
     <div className="relative min-h-screen bg-white flex items-center justify-center py-12">
@@ -66,132 +46,30 @@ export default function Signup() {
           <p className="text-gray-600">Join Toyota Nexus and find your perfect vehicle</p>
         </div>
 
-        {/* Form */}
+        {/* Auth0 Signup Button */}
         <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Error message */}
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2 text-red-700">
-                <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                <span className="text-sm">{error}</span>
-              </div>
-            )}
-
-            {/* Name */}
-            <div>
-              <label className="text-sm font-medium text-toyota-black mb-2 block">Full Name</label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="John Doe"
-                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-toyota-red focus:border-transparent text-toyota-black placeholder:text-gray-400"
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
-
-            {/* Email */}
-            <div>
-              <label className="text-sm font-medium text-toyota-black mb-2 block">Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-toyota-red focus:border-transparent text-toyota-black placeholder:text-gray-400"
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
-
-            {/* Password */}
-            <div>
-              <label className="text-sm font-medium text-toyota-black mb-2 block">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-toyota-red focus:border-transparent text-toyota-black placeholder:text-gray-400"
-                  disabled={isLoading}
-                />
-              </div>
-              {/* Password strength indicator */}
-              {password && (
-                <div className="mt-2">
-                  <div className="flex gap-1">
-                    {['weak', 'medium', 'strong'].map((level, i) => (
-                      <div
-                        key={level}
-                        className={`h-1 flex-1 rounded-full transition-colors ${
-                          passwordStrength === 'strong'
-                            ? 'bg-green-500'
-                            : passwordStrength === 'medium' && i < 2
-                            ? 'bg-yellow-500'
-                            : i === 0
-                            ? 'bg-red-500'
-                            : 'bg-gray-200'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <p className="text-xs text-gray-600 mt-1">
-                    {passwordStrength === 'strong'
-                      ? 'Strong password'
-                      : passwordStrength === 'medium'
-                      ? 'Medium strength'
-                      : 'Weak password'}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Confirm Password */}
-            <div>
-              <label className="text-sm font-medium text-toyota-black mb-2 block">
-                Confirm Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-toyota-red focus:border-transparent text-toyota-black placeholder:text-gray-400"
-                  disabled={isLoading}
-                />
-                {confirmPassword && password === confirmPassword && (
-                  <CheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
-                )}
-              </div>
-            </div>
-
-            {/* Submit */}
+          <div className="space-y-6">
             <Button
-              type="submit"
+              onClick={handleSignup}
               fullWidth
               size="lg"
               disabled={isLoading}
-              className="!py-3 !mt-6"
+              className="!py-3"
             >
               {isLoading ? (
                 <>
                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Creating Account...
+                  Loading...
                 </>
               ) : (
-                'Create Account'
+                'Sign Up with Auth0'
               )}
             </Button>
-          </form>
+
+            <p className="text-sm text-gray-500 text-center">
+              Secure authentication powered by Auth0
+            </p>
+          </div>
 
           {/* Footer */}
           <div className="mt-6 text-center">

@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { Menu, X, LogOut, User } from 'lucide-react'
 import Button from '../ui/Button'
-import { useAuthStore } from '../../store/auth'
+import { useAuth0 } from '@auth0/auth0-react'
 import { clsx } from 'clsx'
 
 const navLinks = [
@@ -16,14 +16,16 @@ export default function NavBar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
   const location = useLocation()
-  const navigate = useNavigate()
-  const { user, logout } = useAuthStore()
+  const { user, logout } = useAuth0()
 
   const isActive = (path: string) => location.pathname === path
 
   const handleLogout = () => {
-    logout()
-    navigate('/')
+    logout({
+      logoutParams: {
+        returnTo: window.location.origin + '/',
+      },
+    })
   }
 
   return (
@@ -113,10 +115,14 @@ export default function NavBar() {
           <div className="md:hidden py-4 border-t border-gray-200">
             <div className="flex flex-col gap-2">
               {navLinks.map((link) => (
-                <Link
+                <a
                   key={link.href}
-                  to={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
+                  href={link.href}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setMobileMenuOpen(false)
+                    window.location.href = link.href
+                  }}
                   className={clsx(
                     'px-4 py-2 text-base font-medium rounded-md transition-colors focus-ring',
                     isActive(link.href)
@@ -125,7 +131,7 @@ export default function NavBar() {
                   )}
                 >
                   {link.label}
-                </Link>
+                </a>
               ))}
 
               {/* Mobile User Info */}
