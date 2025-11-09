@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { z } from "zod";
@@ -94,7 +95,9 @@ app.post("/api/chat/stream", wrapAuth(async (req, res) => {
 
   try {
     const sys = messages.find(m => m.role === "system")?.content;
+    // Build history WITHOUT the last message (which we'll send separately)
     const history = messages
+      .slice(0, -1)  // Exclude the last message
       .filter(m => m.role !== "system")
       .map(m => ({ role: m.role, parts: [{ text: m.content }] }));
 

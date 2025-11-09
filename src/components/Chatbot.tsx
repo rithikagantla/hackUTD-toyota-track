@@ -1,24 +1,53 @@
 import { useState, useRef, useEffect } from 'react'
-import { MessageSquare, Send, X, Loader2 } from 'lucide-react'
+import { MessageSquare, Send, X, Loader2, Trash2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Button from './ui/Button'
 import Card from './ui/Card'
 import { streamChat, type ChatMessage, getQuickSuggestions } from '../lib/ai'
 import { clsx } from 'clsx'
 
+const CHAT_HISTORY_KEY = 'toyota-nexus-chat-history'
+
+// System prompt with vehicle context
+const SYSTEM_PROMPT = `You are Toyota Nexus, a friendly and knowledgeable AI assistant for Toyota vehicles.
+
+You can:
+- Chat naturally about everyday topics and general questions
+- Provide expert advice on Toyota models, trims, pricing, and features
+- Help compare different Toyota vehicles (Camry, Corolla, RAV4, Highlander, etc.)
+- Explain financing vs. leasing options
+- Discuss safety features and ownership tips
+- Answer questions about fuel efficiency, hybrid technology, and electric vehicles
+
+Be warm, conversational, and helpful. Keep responses concise and practical.`
+
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false)
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      role: 'system',
-      content:
-        "You are Toyota Nexus, a friendly and conversational AI assistant. You can chat naturally about everyday topics, answer general questions, and have casual conversations like a human would. When users ask about Toyota vehicles, models, trims, pricing, financing vs. leasing, safety features, or ownership tips, you provide expert, detailed advice. Be warm, personable, and helpful in all conversations. Keep responses concise and natural."
-    }
-  ])
+  const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const abortRef = useRef<AbortController | null>(null)
+
+  // Load conversation history on mount
+  useEffect(() => {
+    const saved = localStorage.getItem(CHAT_HISTORY_KEY)
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        setMessages(parsed)
+      } catch (e) {
+        console.error('Failed to load chat history:', e)
+      }
+    }
+  }, [])
+
+  // Save conversation history whenever messages change
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages))
+    }
+  }, [messages])
 
   const quickSuggestions = getQuickSuggestions()
 
@@ -30,6 +59,11 @@ export default function Chatbot() {
     scrollToBottom()
   }, [messages])
 
+  const clearConversation = () => {
+    setMessages([])
+    localStorage.removeItem(CHAT_HISTORY_KEY)
+  }
+
   const handleSend = async (message?: string) => {
     const textToSend = message || input.trim()
     if (!textToSend || isLoading) return
@@ -37,6 +71,7 @@ export default function Chatbot() {
     const userMsg: ChatMessage = { role: "user", content: textToSend }
     setInput('')
 
+    // Add user message and placeholder for assistant response
     setMessages(m => [...m, userMsg, { role: "model", content: "" }])
     setIsLoading(true)
 
@@ -44,8 +79,12 @@ export default function Chatbot() {
     abortRef.current = new AbortController()
 
     try {
+      // Include system prompt with every request
+      const systemMsg: ChatMessage = { role: "system", content: SYSTEM_PROMPT }
+      const allMessages = [systemMsg, ...messages, userMsg]
+
       for await (const chunk of streamChat(
-        { messages: [...messages, userMsg], model: "gemini-2.0-flash-exp", temperature: 0.5 },
+        { messages: allMessages, model: "gemini-2.0-flash-exp", temperature: 0.7 },
         abortRef.current
       )) {
         if (chunk?.error) throw new Error(chunk.error)
@@ -67,7 +106,14 @@ export default function Chatbot() {
         }
       }
     } catch (e: any) {
-      setMessages(m => [...m, { role: "model", content: `⚠️ ${e.message || "Chat error"}` }])
+      setMessages(m => {
+        const copy = [...m]
+        const last = copy[copy.length - 1]
+        if (last?.role === "model") {
+          last.content = `⚠️ ${e.message || "Chat error. Please try again."}`
+        }
+        return copy
+      })
     } finally {
       setIsLoading(false)
     }
@@ -83,9 +129,6 @@ export default function Chatbot() {
   const handleSuggestionClick = (suggestion: string) => {
     handleSend(suggestion)
   }
-
-  // Filter out system messages for display
-  const displayMessages = messages.filter(m => m.role !== 'system')
 
   return (
     <>
@@ -127,9 +170,22 @@ export default function Chatbot() {
                   </div>
                   <div>
                     <h3 className="font-semibold">Toyota Nexus</h3>
+                    <p className="text-xs text-white/80">AI Assistant</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
+                  {messages.length > 0 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearConversation}
+                      className="!text-white hover:bg-white/10 !p-2"
+                      aria-label="Clear conversation"
+                      title="Clear conversation"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  )}
                   <Button
                     variant="ghost"
                     size="sm"
@@ -144,7 +200,7 @@ export default function Chatbot() {
 
               {/* Messages */}
               <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin bg-toyota-gray-light">
-                {displayMessages.length === 0 && (
+                {messages.length === 0 && (
                   <div className="flex justify-start">
                     <div className="max-w-[80%] rounded-lg px-4 py-2 bg-white text-toyota-black border border-gray-200">
                       <div className="text-sm">
@@ -154,7 +210,7 @@ export default function Chatbot() {
                   </div>
                 )}
 
-                {displayMessages.map((message, idx) => (
+                {messages.map((message, idx) => (
                   <div
                     key={idx}
                     className={clsx(
@@ -205,7 +261,7 @@ export default function Chatbot() {
               </div>
 
               {/* Quick Suggestions */}
-              {displayMessages.length === 0 && !isLoading && (
+              {messages.length === 0 && !isLoading && (
                 <div className="px-4 py-2 border-t border-gray-200 bg-white">
                   <div className="text-xs text-toyota-gray-dark mb-2">Quick suggestions:</div>
                   <div className="flex flex-wrap gap-2">
