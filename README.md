@@ -2,13 +2,13 @@
 
 Your Intelligent Vehicle Recommendation Assistant
 
-<div align="center">
+<div>
 
 An AI-powered web application that helps users discover their perfect Toyota vehicle through personalized recommendations, secure Plaid-powered financial insights, and a modern, animation-rich UI.
 
 </div>
 🎥 Demo Video
-<div align="center">
+<div>
 
 https://youtu.be/DECvJ9SX5y8
 
