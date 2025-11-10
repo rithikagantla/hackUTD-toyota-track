@@ -10,8 +10,7 @@ An AI-powered web application that helps users discover their perfect Toyota veh
 🎥 Demo Video
 <div align="center">
 
-
-🎬 Click to watch the full demo on YouTube
+https://youtu.be/DECvJ9SX5y8
 
 </div>
 ✨ Overview
