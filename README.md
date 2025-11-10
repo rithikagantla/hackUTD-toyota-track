@@ -1,7 +1,7 @@
 # 🚗 **Toyota Nexus**
 ### *Your Intelligent Vehicle Recommendation Assistant*
 
-<div align="center">
+<div>
 
 AI-powered web application that helps users find their **perfect Toyota** through personalized recommendations, **Plaid-based financial insights**, and a **modern, interactive UI**.
 
@@ -134,8 +134,4 @@ AI-powered web application that helps users find their **perfect Toyota** throug
 
 </details>
 
----
-
-<details>
-<summary><strong>📂 Project Structure</strong></summary>
 
