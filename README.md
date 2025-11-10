@@ -1,427 +1,244 @@
-# 🚗 Toyota Nexus
+🚗 Toyota Nexus
 
-**Your Intelligent Vehicle Recommendation Assistant**
+Your Intelligent Vehicle Recommendation Assistant
 
 <div align="center">
 
-
-A stunning, AI-powered web application with **loading screens**, and **authentication** that helps users find their perfect Toyota vehicle through personalized recommendations.
-
-[🎯 Features](#features) • [🚀 Quick Start](#quick-start) • [🎨 Screenshots](#screenshots) • [🤖 AI Chatbot](#chatbot-modes)
+An AI-powered web application that helps users discover their perfect Toyota vehicle through personalized recommendations, secure Plaid-powered financial insights, and a modern, animation-rich UI.
 
 </div>
-
----
-
-## ✨ What's New
+🎥 Demo Video
+<div align="center">
 
 
-### 🔐 Authentication System
-- Sign up / Sign in pages with stunning UI
-- Password strength indicator
-- User profile management
-- Session persistence with localStorage
-- Protected routes with auth guards
+🎬 Click to watch the full demo on YouTube
 
-### ⚡ Loading Screen
-- Animated logo reveal
-- Progress bar with smooth transitions
-- 2-second smooth loading experience
+</div>
+✨ Overview
 
-### 🎨 Enhanced Animations
-- Page transition animations
-- Staggered card reveals
-- Hover effects on all interactive elements
-- Micro-interactions throughout
+Toyota Nexus redefines the car-buying experience by blending AI intelligence, Plaid-enabled financial data, and Toyota design principles.
+It helps users make smarter, more informed decisions based on budget, lifestyle, and real-world affordability.
 
----
+🔐 Authentication System
 
-## 🎯 Features
+Elegant Sign Up / Sign In with glass-morphism design
 
-### Core Features
+Password strength meter & validation
 
-#### 🎯 **Personalized Profile Quiz**
-- 6-step questionnaire to understand your needs
-- Budget, fuel type, body style, and lifestyle preferences
-- Persistent profile storage across sessions
+Session persistence with localStorage
 
-#### 🚗 **Interactive Vehicle Exploration**
-- Browse 20+ realistic Toyota vehicles
-- Advanced filtering by fuel type, body style, and price range
-- Real-time search across vehicle features and descriptions
-- Beautiful card-based layout with responsive design
+Protected routes and route guards
 
-#### 💰 **Payment Simulator**
-- **Finance Calculator**: Accurate monthly payment estimates with adjustable APR, term, and down payment
-- **Lease Calculator**: Lease payment breakdown with residual value and money factor
-- Visual payment breakdown with total cost analysis
-- Side-by-side comparison of financing vs. leasing
+Profile dashboard & logout functionality
 
-#### 🤖 **AI-Powered Chatbot**
-- **MOCK Mode** (default): Rule-based responses with pre-programmed vehicle knowledge
-- **Gemini Mode** (optional): Google Gemini AI integration for advanced conversational support
-- Quick suggestion chips for common questions
-- Markdown formatting support
-- Persistent chat history during session
+⚡ Dynamic Loading & Animations
 
-#### 🎨 **Modern UI/UX**
-- Toyota brand colors (red #EB0A1E and black #1A1A1A)
-- Framer Motion animations for smooth transitions
-- Fully responsive design (mobile, tablet, desktop)
-- Aurora background effects
-- Glass-morphism components
+Animated Toyota Nexus logo reveal (2 s)
 
-#### 📊 **Smart Recommendations**
-- **ReasonPanel**: Personalized "why this fits you" insights
-- Match scoring based on budget, fuel efficiency, and lifestyle tags
-- Safety ratings and feature highlights
+Progress bar with smooth easing
 
----
+Aurora backgrounds and subtle floating particles
 
-## 🚀 Quick Start
+Framer Motion transitions for pages & components
 
-### Prerequisites
+Micro-interactions on hover/click
 
-- **Node.js 18+** and **npm** (or pnpm/yarn)
-- (Optional) Google Gemini API key for AI chatbot mode
+🎯 Core Features
+🧠 Personalized Profile Quiz
 
-### Installation
+6-step questionnaire capturing budget, fuel type, lifestyle, etc.
 
-```bash
-# Clone the repository
-git clone <repository-url>
-cd toyota-nexus
+Persists results and builds a match score for every Toyota model
 
-# Install dependencies
-npm install
+Dynamic recommendations with “Why this fits you” reasoning
 
-# Start development server
-npm run dev
-```
+🚗 Vehicle Exploration
 
-The application will be available at **http://localhost:5173**
+Explore 20 + Toyota models with realistic details
 
-### First Time Experience
+Filter by fuel type, body style, and price range
 
-1. **Loading Screen** - See the animated Toyota Nexus logo (2 seconds)
-2. **Landing Page** - Beautiful aurora animations with CTA buttons
-3. **Sign Up** - Create your account (mock authentication)
-4. **Explore** - Start browsing vehicles!
+Instant search & responsive card layouts
 
-### Building for Production
+Mobile-optimized grid with staggered reveals
 
-```bash
-# Build optimized production bundle
-npm run build
+💰 Finance + Plaid Integration
+💵 Payment Simulator
 
-# Preview production build locally
-npm run preview
-```
+Finance calculator: amortization-based monthly payment estimates
 
----
+Lease calculator: residual value & money factor computations
 
-## 🎨 Screenshots
+Side-by-side comparison: lease vs finance
 
-### 🌟 Landing Page with Aurora Animations
-![Landing Page](./docs/landing.png)
-- Mouse-tracking aurora effect
-- Animated gradient blobs
-- Floating particles
+Interactive sliders for APR, term, and down payment
 
-### ⚡ Loading Screen
-![Loading](./docs/loading.png)
-- Animated logo reveal
-- Progress bar
-- Particle effects
+🏦 Plaid Integration – Real Financial Personalization
 
-### 🔐 Authentication
-![Signup](./docs/signup.png)
-- Glass-morphism design
-- Password strength indicator
-- Smooth animations
+Securely connect a user’s bank account via Plaid Link
 
-### 🏠 Home Page
-![Home](./docs/home.png)
+Pulls real income and balance data to personalize recommendations
 
-### 🔍 Explore Vehicles
-![Explore](./docs/explore.png)
+Adjusts vehicle matches by affordability and loan eligibility
 
-### 🚗 Vehicle Detail
-![Detail](./docs/detail.png)
+Enables upcoming features:
 
-### 📋 Profile Quiz
-![Quiz](./docs/quiz.png)
+Real-time credit & spending analysis
 
-### 💬 AI Chatbot
-![Chatbot](./docs/chatbot.png)
+Personalized financing offers
 
----
+Financial-wellness insights
 
-## 🤖 Chatbot Modes
+All handled with Plaid’s enterprise-grade security
 
-### MOCK Mode (Default)
+💡 Plaid bridges financial reality with vehicle discovery — ensuring recommendations users can truly afford.
 
-The chatbot uses pre-programmed, rule-based responses. **No API key required.**
+🤖 AI Chatbot
 
-**Capabilities:**
-- Vehicle recommendations by type (hybrid, SUV, budget-friendly)
-- Model comparisons (e.g., "Compare Camry vs. Corolla")
-- Lease vs. finance explanations
-- Vehicle-specific information searches
-- Budget and safety recommendations
+MOCK Mode: local rule-based Toyota assistant
 
-**Try these:**
-```
-"Best hybrids under $400/mo"
-"Compare Camry vs. RAV4"
-"Tell me about the Prius"
-"Explain lease vs finance"
-```
+Gemini Mode: integrates Google Gemini AI for real dialogue
 
-### Gemini AI Mode (Optional)
+Persistent chat history, Markdown formatting, and quick reply chips
 
-Enable advanced AI responses using Google's Gemini API.
+🎨 Design & UI
 
-**Setup:**
-1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Sign in and create an API key
-3. In the chatbot, click the settings gear icon
-4. Paste your API key and select a model
-5. Click "Save Settings"
+Toyota palette: Red #EB0A1E, Black #1A1A1A
 
-**⚠️ Security Warning**: API keys are stored in browser localStorage and sent directly to Google's API. This is a **frontend-only demonstration**. In production, API keys should be stored securely on the server.
+Tailwind CSS + Framer Motion for smooth visuals
 
-**Available Models:**
-- **Gemini 1.5 Flash** (Recommended): Fast responses
-- **Gemini 1.5 Pro**: Advanced reasoning
-- **Gemini Pro**: Legacy model
+Aurora gradients, Glass-morphism, and responsive layouts
 
----
+📊 Smart Recommendations
 
-## 🏗️ Tech Stack
+Dynamic ReasonPanel explaining why each car fits the user
 
-### Frontend Framework
-- **React 18** with TypeScript
-- **Vite** for blazing-fast builds
+Weighted scoring using:
 
-### Routing & State
-- **React Router v6** with protected routes
-- **Zustand** with persistence
+Plaid budget data
 
-### Styling & Animation
-- **Tailwind CSS** with custom Toyota theme
-- **Framer Motion** for animations
+Fuel efficiency preferences
 
-### AI Integration
-- **Google Generative AI** (Gemini)
+Safety & feature tags
 
-### UI Components
-- **Lucide React** for icons
-- Custom component library
-
----
-
-## 📂 Project Structure
-
-```
+<details> <summary>🧱 <strong>Tech Stack Details</strong></summary>
+Category	Technology
+Frontend	React 18 + TypeScript
+Build Tool	Vite
+Routing	React Router v6
+State Mgmt	Zustand (persistent store)
+Styling	Tailwind CSS + Toyota theme
+Animation	Framer Motion
+AI	Google Gemini API
+Financial Integration	Plaid Link API
+Icons	Lucide React
+Deploy	Vercel / Netlify / Render
+</details>
+<details> <summary>📂 <strong>Project Structure</strong></summary>
 toyota-nexus/
 ├── public/
 │   └── toyota-logo.svg
 ├── src/
 │   ├── components/
-│   │   ├── ui/              # Reusable components (Button, Card, etc.)
-│   │   ├── layout/          # NavBar, Footer, Hero
+│   │   ├── ui/
+│   │   ├── layout/
 │   │   ├── Chatbot.tsx
-│   │   ├── SettingsModal.tsx
+│   │   ├── PlaidConnect.tsx     # 🔐 Plaid integration
+│   │   ├── PaymentBreakdown.tsx
 │   │   ├── LoadingScreen.tsx
 │   │   ├── ReasonPanel.tsx
-│   │   └── PaymentBreakdown.tsx
-│   ├── routes/              # Page components
-│   │   ├── Landing.tsx      # 🌟 Aurora landing page
-│   │   ├── Login.tsx        # 🔐 Sign in
-│   │   ├── Signup.tsx       # 🔐 Sign up
-│   │   ├── Home.tsx         # Main app home
-│   │   ├── Explore.tsx
-│   │   ├── VehicleDetail.tsx
-│   │   ├── ProfileQuiz.tsx
-│   │   └── About.tsx
+│   │   └── SettingsModal.tsx
+│   ├── routes/
 │   ├── store/
-│   │   ├── auth.ts          # 🔐 Authentication store
-│   │   └── profile.ts       # User profile store
 │   ├── lib/
-│   │   ├── filters.ts
-│   │   ├── finance.ts       # Finance/lease calculations
-│   │   └── ai.ts            # AI chatbot logic
+│   │   ├── finance.ts
+│   │   ├── plaid.ts             # 💵 Plaid logic
+│   │   └── ai.ts
 │   ├── data/
-│   │   └── vehicles.ts      # 20 Toyota vehicles
 │   ├── styles/
-│   │   └── globals.css
-│   ├── app.tsx              # 🛣️ Routing with auth guards
+│   ├── app.tsx
 │   └── main.tsx
-├── package.json
-├── vite.config.ts
-├── tailwind.config.js
-└── README.md
-```
+└── package.json
 
----
+</details>
+🚀 Quick Start
+Prerequisites
 
-## 🎮 User Flow
+Node.js 18 +
 
-### First-Time User
+(Optional) Google Gemini API Key
 
-```
-1. Loading Screen (2s)
-   ↓
-2. Landing Page (Aurora animations)
-   ↓
-3. Click "Get Started"
-   ↓
-4. Sign Up
-   ↓
-5. Redirected to /app (Main Home)
-   ↓
-6. Take Quiz → Explore → Vehicle Details → Chatbot
-```
+(Optional) Plaid Developer Account (for sandbox testing)
 
-### Returning User
+Installation
+git clone <repository-url>
+cd toyota-nexus
+npm install
+npm run dev
 
-```
-1. Loading Screen (2s)
-   ↓
-2. Landing Page
-   ↓
-3. Click "Sign In"
-   ↓
-4. Login
-   ↓
-5. Redirected to /app (Main Home)
-```
 
----
+Visit → http://localhost:5173
 
-## 🔐 Authentication
+🧭 User Flow
 
-This app uses **simulated authentication** for demonstration purposes:
+First-time User
 
-- **Sign Up**: Enter name, email, and password (min 6 characters)
-- **Login**: Use the same email/password
-- **Session**: Stored in browser localStorage
-- **Protected Routes**: `/app/*` routes require authentication
-- **Logout**: Click user menu → Sign Out
+Loading → Landing → Sign Up → Quiz → Connect Bank (Plaid) → Explore → Chatbot
 
-> **Note**: In production, you would integrate a real authentication service like Firebase, Auth0, or your own backend API.
 
----
+Returning User
 
-## 💰 Finance Calculations
+Loading → Sign In → Personalized Dashboard
 
-The payment simulator uses standard amortization formulas:
+💰 Finance Formulas
+Financing
+M = P[r(1+r)^n] / [(1+r)^n - 1]
 
-### Financing Formula
 
-```
-M = P[r(1+r)^n]/[(1+r)^n-1]
+(M = monthly payment, P = principal, r = APR/12/100, n = months)
 
-Where:
-  M = Monthly payment
-  P = Principal (amount financed)
-  r = Monthly interest rate (APR / 12 / 100)
-  n = Number of payments
-```
+Leasing
+Monthly = (CapCost − Residual)/Term + (CapCost + Residual)×MoneyFactor
+MoneyFactor = APR/2400
 
-**Example Test Case:**
-- MSRP: $30,000
-- Down payment: $3,000
-- APR: 5.5%
-- Term: 60 months
-- **Expected monthly: ~$513.45**
-- **Total paid: ~$30,807**
-- **Total interest: ~$3,807**
+<details> <summary>♿ <strong>Accessibility + Compatibility</strong></summary>
 
-### Leasing Formula
+✅ Semantic HTML & ARIA
 
-```
-Monthly Payment = Depreciation Fee + Finance Fee
+✅ Keyboard navigation / focus visibility
 
-Depreciation Fee = (Adjusted Cap Cost - Residual Value) / Term
-Finance Fee = (Adjusted Cap Cost + Residual Value) × Money Factor
+✅ Reduced-motion support
 
-Money Factor = APR / 2400
-```
+✅ Contrast compliance
 
----
+✅ Chrome / Edge / Firefox / Safari / Mobile browsers
 
-## ♿ Accessibility
+</details>
+<details> <summary>🧩 <strong>Future Enhancements</strong></summary>
 
-- ✅ Semantic HTML structure
-- ✅ ARIA labels for screen readers
-- ✅ Keyboard navigation support
-- ✅ Focus visible styles on all interactive elements
-- ✅ Reduced motion support via `prefers-reduced-motion`
-- ✅ Sufficient color contrast ratios
-- ✅ Form labels and error messages
+ Backend API for users & vehicle data
 
----
+ Secure server-side Plaid token exchange
 
-## 🌐 Browser Compatibility
+ Real-time Toyota pricing feed
 
-- Chrome/Edge 90+
-- Firefox 88+
-- Safari 14+
-- Mobile browsers (iOS Safari, Chrome Mobile)
+ Dealer locator & test-drive scheduling
 
----
+ Vehicle comparison tool
 
-## 📝 Known Limitations
+ AI voice assistant mode
 
-1. **Frontend-Only**: All data is client-side. No backend API or database.
-2. **Mock Authentication**: Authentication is simulated with localStorage.
-3. **API Key Security**: Gemini API key stored in localStorage (not production-safe).
-4. **Vehicle Images**: Using placeholder images from Unsplash.
-5. **No Real Data**: Vehicle pricing and specs are realistic but not live from Toyota.
-6. **Payment Estimates**: Simplified calculations for demonstration purposes.
+ Multi-language support
 
----
+ Analytics dashboard
 
-## 🚀 Future Enhancements
+</details>
+📜 License
 
-- [ ] Backend API for vehicle data and user profiles
-- [ ] Real authentication with JWT/OAuth
-- [ ] Real-time pricing from Toyota API
-- [ ] Dealer locator integration
-- [ ] Test drive scheduling
-- [ ] Vehicle comparison tool (side-by-side)
-- [ ] Favorite/bookmark vehicles
-- [ ] Email quote requests
-- [ ] Social sharing
-- [ ] Advanced analytics
-- [ ] Multi-language support
+For educational and demonstration purposes only.
+Not affiliated with Toyota Motor Corporation or Plaid Inc..
 
----
+🤝 Contributing
 
-## 📄 License
-
-This is a demonstration project created for educational purposes. Not affiliated with Toyota Motor Corporation.
-
----
-
-## 🙏 Contributing
-
-This is a demonstration project, but feedback and suggestions are welcome!
-
----
-
-## 📧 Contact
-
-For questions or feedback, please open an issue on GitHub.
-
----
-
-<div align="center">
-
-**Built with ❤️ using React, TypeScript, Tailwind CSS, and Framer Motion**
-
-[⬆ Back to Top](#-toyota-nexus)
-
-</div>
+Pull requests and feedback welcome 💬
+Open an issue or PR on GitHub to collaborate.
